@@ -1,17 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY, {
-  apiUrl: 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent'
+  apiUrl:
+    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent",
 });
 
 export const generateLearningPath = async (topic) => {
-  if (!topic || typeof topic !== 'string') {
-    throw new Error('Invalid topic provided');
+  if (!topic || typeof topic !== "string") {
+    throw new Error("Invalid topic provided");
   }
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
+
     const prompt = `Generate a comprehensive learning path for: "${topic}"
     Requirements:
     - Create exactly 5 progressive modules
@@ -25,22 +26,22 @@ export const generateLearningPath = async (topic) => {
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    
+
     try {
-      const cleanText = text.replace(/```json\n|\n```|`/g, '').trim();
+      const cleanText = text.replace(/```json\n|\n```|`/g, "").trim();
       const modules = JSON.parse(cleanText);
       if (!Array.isArray(modules) || modules.length !== 5) {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
       return modules;
     } catch (error) {
-      console.error('Parsing error:', error);
+      console.error("Parsing error:", error);
       return [
         `Module 1: Introduction to ${topic}`,
         `Module 2: Core Concepts of ${topic}`,
         `Module 3: Intermediate ${topic} Techniques`,
         `Module 4: Advanced ${topic} Applications`,
-        `Module 5: Real-world ${topic} Projects`
+        `Module 5: Real-world ${topic} Projects`,
       ];
     }
   } catch (error) {
@@ -49,14 +50,16 @@ export const generateLearningPath = async (topic) => {
 };
 
 export const generateModuleContent = async (moduleName, isExpanded = false) => {
-  if (!moduleName || typeof moduleName !== 'string') {
-    throw new Error('Invalid module name provided');
+  if (!moduleName || typeof moduleName !== "string") {
+    throw new Error("Invalid module name provided");
   }
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    const prompt = `Create highly detailed ${isExpanded ? 'comprehensive' : 'concise'} educational content for: "${moduleName}"
+
+    const prompt = `Create highly detailed ${
+      isExpanded ? "comprehensive" : "concise"
+    } educational content for: "${moduleName}"
     
     Requirements:
     - Content must be practical and actionable
@@ -88,31 +91,85 @@ export const generateModuleContent = async (moduleName, isExpanded = false) => {
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    
+
     try {
-      const cleanText = text.replace(/```json\n|\n```|`/g, '').trim();
+      const cleanText = text.replace(/```json\n|\n```|`/g, "").trim();
       const content = JSON.parse(cleanText);
       if (!content.title || !Array.isArray(content.sections)) {
-        throw new Error('Invalid content structure');
+        throw new Error("Invalid content structure");
       }
       return content;
     } catch (error) {
-      console.error('Content parsing error:', error);
+      console.error("Content parsing error:", error);
       return {
         title: moduleName,
-        sections: [{
-          title: "Module Overview",
-          content: "Content is being generated. Please try again.",
-          keyPoints: ["Key concepts will be listed here"],
-          codeExample: null
-        }],
+        sections: [
+          {
+            title: "Module Overview",
+            content: "Content is being generated. Please try again.",
+            keyPoints: ["Key concepts will be listed here"],
+            codeExample: null,
+          },
+        ],
         summary: "Module content overview",
         hasMoreContent: false,
         difficulty: "beginner",
-        estimatedTimeMinutes: 30
+        estimatedTimeMinutes: 30,
       };
     }
   } catch (error) {
     throw new Error(`Failed to generate module content: ${error.message}`);
+  }
+};
+
+export const generateFlashcards = async (topic, numCards = 5) => {
+  if (!topic || typeof topic !== "string") {
+    throw new Error("Invalid topic provided");
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `Generate ${numCards} educational flashcards on "${topic}" with increasing difficulty.
+    
+    **Requirements:**
+    - The **front side (question)** must be **short and clear**.
+    - The **back side (answer)** must be **detailed (3-4 sentences) and informative**.
+    - Ensure **difficulty increases from Flashcard 1 to ${numCards}**:
+      - Start with **basic concepts**.
+      - Progress to **intermediate details**.
+      - End with **advanced questions requiring deeper understanding**.
+    - Format the response **strictly** as a JSON array:
+
+    [
+      { "id": 1, "frontHTML": "Basic question?", "backHTML": "Detailed easy explanation." },
+      { "id": 2, "frontHTML": "Intermediate question?", "backHTML": "Detailed intermediate explanation." },
+      { "id": ${numCards}, "frontHTML": "Advanced question?", "backHTML": "Detailed advanced explanation." }
+    ]`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    try {
+      const cleanText = text.replace(/```json\n|\n```|`/g, "").trim();
+      const flashcards = JSON.parse(cleanText);
+
+      if (!Array.isArray(flashcards) || flashcards.length !== numCards) {
+        throw new Error("Invalid flashcard format");
+      }
+
+      return flashcards;
+    } catch (error) {
+      console.error("Flashcard parsing error:", error);
+      return Array.from({ length: numCards }, (_, i) => ({
+        id: i + 1,
+        frontHTML: `Basic to advanced ${topic} question ${i + 1}?`,
+        backHTML: `Detailed answer explaining ${topic} at difficulty level ${
+          i + 1
+        }.`,
+      }));
+    }
+  } catch (error) {
+    throw new Error(`Failed to generate flashcards: ${error.message}`);
   }
 };
