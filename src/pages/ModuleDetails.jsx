@@ -8,6 +8,7 @@ import { Databases } from 'appwrite';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { RiBookOpenLine, RiCheckLine, RiArrowRightLine, RiCodeLine } from 'react-icons/ri';
 
 const ModuleDetails = () => {
   const { pathId, moduleIndex } = useParams();
@@ -66,12 +67,40 @@ const ModuleDetails = () => {
     }
   };
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-64">Loading...</div>;
-  }
+  const LoadingScreen = () => (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-slate-50 to-purple-50">
+      <motion.div
+        className="relative w-16 h-16"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+      >
+        <div className="absolute inset-0 rounded-full border-4 border-purple-100" />
+        <div className="absolute inset-0 rounded-full border-4 border-t-purple-600 border-r-transparent border-b-transparent border-l-transparent" />
+      </motion.div>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-gray-600"
+      >
+        Preparing your learning materials...
+      </motion.p>
+    </div>
+  );
 
+  if (loading) return <LoadingScreen />;
   if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-purple-50">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-500 text-center bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-red-100"
+        >
+          {error}
+        </motion.div>
+      </div>
+    );
   }
 
   // Custom renderer for code blocks
@@ -99,101 +128,121 @@ const ModuleDetails = () => {
   };
 
   return (
-    <div className="flex-1">
-      <div className="bg-white rounded-lg p-6 shadow-lg">
-        {/* Header section */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-6">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-4xl mx-auto space-y-8"
+      >
+        {/* Enhanced Header section */}
         <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-purple-100/30"
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-            {content?.title}
-          </h1>
-          <div className="mt-2 text-gray-600">
-            Module {parseInt(moduleIndex) + 1}
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <RiBookOpenLine className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                {content?.title}
+              </h1>
+              <p className="text-gray-600 mt-1">Module {parseInt(moduleIndex) + 1}</p>
+            </div>
           </div>
         </motion.div>
 
-        {/* Content section */}
-        <motion.div className="prose prose-purple max-w-none">
-          <div className="space-y-8">
-            {content?.sections.map((section, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 + 0.3 }}
-                className="bg-purple-50/50 p-6 rounded-lg"
-              >
-                <h2 className="text-xl font-semibold text-purple-700 mb-4">
-                  {section.title}
-                </h2>
-                
-                <div className="text-gray-600">
-                  <ReactMarkdown components={renderers}>
-                    {section.content}
-                  </ReactMarkdown>
-                </div>
+        {/* Enhanced Content section */}
+        <motion.div className="prose prose-purple max-w-none space-y-6">
+          {content?.sections.map((section, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl border border-purple-100/30 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6 flex items-center gap-3">
+                <span>{section.title}</span>
+              </h2>
+              
+              <div className="text-gray-600 space-y-4">
+                <ReactMarkdown components={renderers}>
+                  {section.content}
+                </ReactMarkdown>
+              </div>
 
-                {section.codeExample && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-medium text-purple-600 mb-2">
-                      Code Example:
-                    </h3>
-                    <SyntaxHighlighter
-                      language={section.codeExample.language}
-                      style={vscDarkPlus}
-                      className="rounded-lg"
-                    >
-                      {section.codeExample.code}
-                    </SyntaxHighlighter>
-                    <p className="mt-2 text-gray-600">
-                      {section.codeExample.explanation}
-                    </p>
+              {section.codeExample && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-6 bg-gray-900 rounded-xl overflow-hidden"
+                >
+                  <div className="flex items-center justify-between px-4 py-2 bg-gray-800">
+                    <div className="flex items-center gap-2">
+                      <RiCodeLine className="text-gray-400" />
+                      <span className="text-sm text-gray-400">
+                        {section.codeExample.language}
+                      </span>
+                    </div>
                   </div>
-                )}
-
-                {section.keyPoints && (
-                  <ul className="mt-4 list-disc list-inside space-y-2 text-gray-600">
-                    {section.keyPoints.map((point, i) => (
-                      <li key={i} className="ml-4">{point}</li>
-                    ))}
-                  </ul>
-                )}
-              </motion.div>
-            ))}
-          </div>
+                  <SyntaxHighlighter
+                    language={section.codeExample.language}
+                    style={vscDarkPlus}
+                    className="!m-0"
+                  >
+                    {section.codeExample.code}
+                  </SyntaxHighlighter>
+                </motion.div>
+              )}
+            </motion.div>
+          ))}
         </motion.div>
 
-        {/* Action buttons */}
-        <motion.div className="mt-8 flex justify-between items-center">
+        {/* Enhanced Action buttons */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="sticky bottom-6 flex justify-between items-center bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-purple-100/30 shadow-xl"
+        >
           {content?.hasMoreContent && !isExpanded && (
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => loadContent(true)}
-              className="px-6 py-3 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200"
+              className="px-6 py-3 bg-purple-100 text-purple-600 rounded-xl hover:bg-purple-200 transition-colors flex items-center gap-2"
             >
               Read More
+              <RiArrowRightLine />
             </motion.button>
           )}
           
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleComplete}
             disabled={isCompleted}
-            className={`px-6 py-3 rounded-lg text-white ${
+            className={`px-6 py-3 rounded-xl text-white flex items-center gap-2 ${
               isCompleted 
                 ? 'bg-green-500'
-                : 'bg-purple-600 hover:bg-purple-700'
-            } transition-colors`}
+                : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-500/20'
+            } transition-all`}
           >
-            {isCompleted ? 'Completed!' : 'Mark as Complete'}
+            {isCompleted ? (
+              <>
+                <RiCheckLine />
+                Completed!
+              </>
+            ) : (
+              <>
+                Mark as Complete
+                <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
           </motion.button>
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   );
 };
