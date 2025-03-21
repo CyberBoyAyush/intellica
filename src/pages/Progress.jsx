@@ -1,41 +1,80 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { getLearningPaths } from "../config/database";
+import { useAuth } from "../context/AuthContext";
 
 const Progress = () => {
+  const { user, loading } = useAuth();
+  const [paths, setPaths] = useState([]);
+
+  useEffect(() => {
+    if (user) fetchPaths();
+  }, [user]);
+
+  const fetchPaths = async () => {
+    try {
+      const response = await getLearningPaths(user.$id);
+      setPaths(response.documents);
+    } catch (error) {
+      console.error("Error fetching paths:", error);
+    }
+  };
+
+  if (loading) return <p className="text-center text-purple-600">Loading...</p>;
+  if (!user)
+    return <p className="text-center text-gray-500">No user data available.</p>;
+
+  // Transforming data for recharts
+  const chartData = paths.map((path) => ({
+    topic: path.topicName,
+    progress: path.progress,
+  }));
+
   return (
     <motion.div
-      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="flex flex-col items-center p-6 bg-white min-h-screen"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <motion.div
-        className="text-center"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-          Progress Tracking
-        </h1>
-        <div className="bg-white p-8 rounded-2xl shadow-lg">
-          <div className="flex flex-col items-center gap-4">
-            <motion.div
-              className="w-16 h-16"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            >
-              <svg className="w-full h-full text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </motion.div>
-            <p className="text-xl text-gray-600">Coming Soon!</p>
-            <p className="text-gray-500">
-              Track your learning progress and achievements
-            </p>
-          </div>
-        </div>
-      </motion.div>
+      <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+        Learning Progress
+      </h1>
+
+      {chartData.length > 0 ? (
+        <motion.div
+          className="w-full max-w-4xl bg-gray-100 p-4 rounded-xl shadow-md"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+              <XAxis dataKey="topic" tick={{ fill: "#6B46C1" }} />
+              <YAxis tick={{ fill: "#6B46C1" }} />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="progress"
+                stroke="#6B46C1"
+                strokeWidth={3}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+      ) : (
+        <p className="text-gray-500">No progress data available.</p>
+      )}
     </motion.div>
   );
 };
