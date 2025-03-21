@@ -43,6 +43,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       path: "/settings",
       active: location.pathname.includes('settings')
     },
+    { 
+      icon: "💬", 
+      label: "AI Chat",
+      path: "/chat",
+      active: location.pathname === '/chat'
+    },
   ];
 
   const handleNavigation = (path) => {

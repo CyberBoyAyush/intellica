@@ -15,6 +15,7 @@ import ModuleDetails from "./pages/ModuleDetails";
 import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
 import { AuthProvider } from "./context/AuthContext";
+import Chat from "./pages/Chat";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -63,6 +64,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/learning-path/:pathId/module/:moduleIndex" element={
               <ProtectedRoute>
                 <ModuleDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <Chat />
               </ProtectedRoute>
             } />
           </Routes>
