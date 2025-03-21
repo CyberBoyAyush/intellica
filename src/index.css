@@ -14,3 +14,8 @@
 * {
   transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
 }
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
