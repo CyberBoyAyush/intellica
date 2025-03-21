@@ -173,3 +173,62 @@ export const generateFlashcards = async (topic, numCards = 5) => {
     throw new Error(`Failed to generate flashcards: ${error.message}`);
   }
 };
+
+export const generateQuizData = async (topic, numQuestions = 5) => {
+  if (!topic || typeof topic !== "string") {
+    throw new Error("Invalid topic provided");
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    const prompt = `Generate a quiz on "${topic}" with ${numQuestions} questions.
+    
+    **Requirements:**
+    - Each question should be **clear and well-structured**.
+    - Include **single-choice and multiple-choice** questions randomly.
+    - Provide **4 answer options** for each question.
+    - Clearly indicate the **correct answer(s)**.
+    - Give a **short explanation** for the correct answer.
+    - Assign **points (default: 10 per question)**.
+    - Format the response as a **JSON array**:
+
+    [
+      {
+        "question": "Example question?",
+        "questionType": "single",
+        "answers": ["Option A", "Option B", "Option C", "Option D"],
+        "correctAnswer": "Option A",
+        "explanation": "Short explanation here.",
+        "point": 10
+      },
+      {
+        "question": "Another example?",
+        "questionType": "multiple",
+        "answers": ["Option A", "Option B", "Option C", "Option D"],
+        "correctAnswer": ["Option B", "Option C"],
+        "explanation": "Short explanation here.",
+        "point": 10
+      }
+    ]`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    try {
+      const cleanText = text.replace(/```json\n|\n```|`/g, "").trim();
+      const quizData = JSON.parse(cleanText);
+
+      if (!Array.isArray(quizData) || quizData.length !== numQuestions) {
+        throw new Error("Invalid quiz format");
+      }
+
+      return { nrOfQuestions: numQuestions.toString(), questions: quizData };
+    } catch (error) {
+      console.error("Quiz parsing error:", error);
+      return { nrOfQuestions: "0", questions: [] };
+    }
+  } catch (error) {
+    throw new Error(`Failed to generate quiz: ${error.message}`);
+  }
+};
