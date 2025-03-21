@@ -18,6 +18,7 @@ const ModuleDetails = () => {
   const [error, setError] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedContent, setExpandedContent] = useState(null);
   const databases = new Databases(client);
 
   const loadContent = async (expanded = false) => {
@@ -31,9 +32,18 @@ const ModuleDetails = () => {
 
       const modules = JSON.parse(response.modules);
       const moduleTitle = modules[parseInt(moduleIndex)];
-      const moduleContent = await generateModuleContent(moduleTitle, expanded);
       
+      // Get initial content
+      const moduleContent = await generateModuleContent(moduleTitle, expanded);
       setContent(moduleContent);
+      
+      // If expanded, get additional content
+      if (expanded) {
+        setLoading(true);
+        const additionalContent = await generateModuleContent(moduleTitle, true);
+        setExpandedContent(additionalContent);
+      }
+      
       setIsExpanded(expanded);
     } catch (error) {
       setError('Failed to load module content');
@@ -193,6 +203,98 @@ const ModuleDetails = () => {
               )}
             </motion.div>
           ))}
+
+          {/* Expanded Content */}
+          {isExpanded && expandedContent && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.5 }}
+              className="mt-8"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="p-6 bg-purple-50/50 backdrop-blur-sm rounded-2xl border border-purple-100/30 mb-6"
+              >
+                <h3 className="text-xl font-semibold text-purple-600">Additional Content</h3>
+                <p className="text-gray-600 mt-1">
+                  Explore more in-depth information about this topic
+                </p>
+              </motion.div>
+
+              {expandedContent.sections.map((section, index) => (
+                <motion.div
+                  key={`expanded-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 + 0.5 }}
+                  className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl border border-purple-100/30 shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+                    {section.title}
+                  </h2>
+                  
+                  <div className="text-gray-600 space-y-4 prose prose-purple max-w-none">
+                    <ReactMarkdown
+                      components={{
+                        ...renderers,
+                        p: ({ children }) => <p className="mb-4">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
+                        h3: ({ children }) => (
+                          <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">{children}</h3>
+                        ),
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-4 border-purple-200 pl-4 italic my-4">
+                            {children}
+                          </blockquote>
+                        ),
+                      }}
+                    >
+                      {section.content}
+                    </ReactMarkdown>
+                  </div>
+
+                  {section.codeExample && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-6"
+                    >
+                      <div className="bg-gray-900 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-2 bg-gray-800">
+                          <div className="flex items-center gap-2">
+                            <RiCodeLine className="text-gray-400" />
+                            <span className="text-sm text-gray-400">
+                              {section.codeExample.language}
+                            </span>
+                          </div>
+                        </div>
+                        <SyntaxHighlighter
+                          language={section.codeExample.language}
+                          style={vscDarkPlus}
+                          className="!m-0"
+                          showLineNumbers
+                          wrapLines
+                        >
+                          {section.codeExample.code}
+                        </SyntaxHighlighter>
+                        {section.codeExample.explanation && (
+                          <div className="px-4 py-3 bg-gray-800/50 border-t border-gray-700">
+                            <p className="text-sm text-gray-300">
+                              {section.codeExample.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Enhanced Action buttons */}
