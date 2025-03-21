@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateFlashcards } from "../config/gemini";
+import { updateUserProgress } from "../config/database";
+import { useAuth } from '../context/AuthContext';
 
 const CustomCard = ({ card, isFlipped, onClick }) => (
   <div className="relative w-full h-[400px] cursor-pointer" onClick={onClick}>
@@ -43,6 +45,7 @@ const Flashcards = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   const fetchFlashcards = async () => {
     if (!topic.trim() || numCards < 1) {
@@ -57,8 +60,15 @@ const Flashcards = () => {
     try {
       const generatedCards = await generateFlashcards(topic, numCards);
       setCards(generatedCards);
+      
+      if (user?.$id) {
+        await updateUserProgress(user.$id, {
+          topicName: topic,
+          flashcardCount: generatedCards.length // Update with actual number of cards
+        });
+      }
     } catch (err) {
-      console.error("Error fetching flashcards:", err);
+      console.error("Error:", err);
       setError("Failed to load flashcards. Try again!");
     } finally {
       setLoading(false);

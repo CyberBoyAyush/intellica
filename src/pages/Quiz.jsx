@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { generateQuizData } from "../config/gemini";
 import QuizCard from "../components/QuizCard";
+import { useAuth } from '../context/AuthContext';
+import { updateUserProgress } from '../config/database';
 
 const Quiz = () => {
   const [topic, setTopic] = useState("");
@@ -13,6 +15,7 @@ const Quiz = () => {
   const [score, setScore] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const handleGenerateQuiz = async () => {
     if (!topic || numQuestions < 1) {
@@ -50,7 +53,7 @@ const Quiz = () => {
   };
 
   useEffect(() => {
-    if (showResults && quizData) {
+    if (showResults && quizData && user?.$id) {
       let totalScore = 0;
       let correctCount = 0;
 
@@ -67,11 +70,22 @@ const Quiz = () => {
       });
 
       setScore(totalScore);
-      setAccuracy(
-        ((correctCount / quizData.questions.length) * 100).toFixed(2)
-      );
+      const accuracyValue = ((correctCount / quizData.questions.length) * 100).toFixed(2);
+      setAccuracy(accuracyValue);
+
+      // Update user progress
+      updateUserProgress(user.$id, {
+        topicName: topic,
+        quizScores: {
+          topic,
+          score: totalScore,
+          accuracy: accuracyValue,
+          totalQuestions: quizData.questions.length,
+          date: new Date().toISOString()
+        }
+      }).catch(console.error);
     }
-  }, [showResults, quizData, userAnswers]);
+  }, [showResults, quizData, userAnswers, user]);
 
   if (loading) {
     return (
