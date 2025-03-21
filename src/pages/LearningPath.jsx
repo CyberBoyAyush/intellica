@@ -14,6 +14,14 @@ const LearningPath = () => {
   const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
+  const topicSuggestions = [
+    { name: "JavaScript Fundamentals", icon: "⚡" },
+    { name: "React Basics", icon: "⚛️" },
+    { name: "Python for Beginners", icon: "🐍" },
+    { name: "Web Development", icon: "🌐" },
+    { name: "Data Structures", icon: "🏗️" },
+  ];
+
   useEffect(() => {
     fetchPaths();
   }, []);
@@ -156,7 +164,7 @@ const LearningPath = () => {
           ))}
         </motion.div>
 
-        {/* Enhanced Modal */}
+        {/* Enhanced Create Path Modal */}
         <AnimatePresence>
           {showModal && (
             <motion.div 
@@ -164,62 +172,115 @@ const LearningPath = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              onClick={() => setShowModal(false)}
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl w-full max-w-md shadow-2xl border border-purple-100/30"
+                className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl w-full max-w-lg shadow-2xl border border-purple-100/30"
+                onClick={(e) => e.stopPropagation()}
               >
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-                  Create Learning Path
-                </h2>
-                <input
-                  type="text"
-                  placeholder="Enter topic name"
-                  value={topicName}
-                  onChange={(e) => setTopicName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-purple-100 focus:border-purple-300 focus:ring-2 focus:ring-purple-200 outline-none transition-all mb-6"
-                />
-                <div className="flex justify-end gap-4">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setShowModal(false)}
-                    className="px-6 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
-                  >
-                    Cancel
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleCreate}
-                    disabled={loading}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-lg disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <div className="flex items-center gap-2">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                        />
-                        Creating...
-                      </div>
-                    ) : (
-                      'Create Path'
+                <div className="space-y-6">
+                  {/* Header */}
+                  <div className="text-center space-y-2">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                      Create Your Learning Journey
+                    </h2>
+                    <p className="text-gray-600">
+                      Enter a topic or select from suggestions to start learning
+                    </p>
+                  </div>
+
+                  {/* Topic Input */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Topic Name</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="e.g., JavaScript Fundamentals"
+                        value={topicName}
+                        onChange={(e) => setTopicName(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-purple-100 focus:border-purple-300 focus:ring-2 focus:ring-purple-200 outline-none transition-all pl-10"
+                      />
+                      <span className="absolute left-3 top-3 text-gray-400">
+                        🎯
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Topic Suggestions */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-gray-700">Popular Topics</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {topicSuggestions.map((topic, index) => (
+                        <motion.button
+                          key={index}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setTopicName(topic.name)}
+                          className={`p-3 rounded-xl flex items-center gap-2 transition-all ${
+                            topicName === topic.name
+                              ? 'bg-purple-100 text-purple-700'
+                              : 'hover:bg-purple-50 text-gray-600'
+                          }`}
+                        >
+                          <span>{topic.icon}</span>
+                          <span className="text-sm">{topic.name}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-3 pt-4">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setShowModal(false)}
+                      className="px-6 py-2.5 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors text-sm"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleCreate}
+                      disabled={!topicName.trim() || loading}
+                      className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-lg disabled:opacity-50 text-sm font-medium"
+                    >
+                      {loading ? (
+                        <div className="flex items-center gap-2">
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                          />
+                          <span>Generating Path...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span>Create Path</span>
+                          <span>→</span>
+                        </div>
+                      )}
+                    </motion.button>
+                  </div>
+
+                  {/* Error Message */}
+                  <AnimatePresence>
+                    {error && (
+                      <motion.p 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="text-red-500 text-sm text-center"
+                      >
+                        {error}
+                      </motion.p>
                     )}
-                  </motion.button>
+                  </AnimatePresence>
                 </div>
-                {error && (
-                  <motion.p 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-red-500 mt-4 text-center"
-                  >
-                    {error}
-                  </motion.p>
-                )}
               </motion.div>
             </motion.div>
           )}
