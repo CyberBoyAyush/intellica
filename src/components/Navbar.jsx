@@ -1,9 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
+  const { user, loading, logout } = useAuth();
 
   const handleLogin = () => {
     navigate("/login");  // Changed from /dashboard to /login
@@ -15,6 +17,30 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
 
   const handleLogout = () => {
     navigate('/');
+  };
+
+  const getUserDisplay = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-purple-200 rounded-full animate-pulse" />
+          <div className="w-20 h-4 bg-purple-200 rounded animate-pulse" />
+        </div>
+      );
+    }
+
+    if (!user) return null;
+
+    return (
+      <>
+        <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
+          {user.$id ? user.$id[0].toUpperCase() : '👤'}
+        </div>
+        <span className="text-gray-700 font-medium">
+          {user.name || user.email?.split('@')[0] || user.$id}
+        </span>
+      </>
+    );
   };
 
   return (
@@ -71,16 +97,14 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
             whileHover={{ scale: 1.02 }}
             className="hidden md:flex items-center gap-3 bg-purple-50 px-4 py-2 rounded-lg"
           >
-            <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
-              👤
-            </div>
-            <span className="text-gray-700 font-medium">John Doe</span>
+            {getUserDisplay()}
           </motion.div>
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
+            onClick={logout}
             className="px-3 md:px-4 py-2 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/20 flex items-center gap-2 hover:bg-purple-700 transition-colors"
+            disabled={loading}
           >
             <span className="hidden md:inline">Logout</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
