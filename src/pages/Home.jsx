@@ -19,16 +19,16 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-purple-50 overflow-hidden">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-      <div className="absolute top-20 -right-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-      <div className="absolute top-40 -left-20 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-purple-50 relative w-full">
+      <div className="fixed inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+      <div className="fixed top-20 -right-20 md:right-0 w-72 md:w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+      <div className="fixed top-40 -left-20 md:left-0 w-72 md:w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
       
       <motion.div 
         variants={container}
         initial="hidden"
         animate="show"
-        className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 relative z-10 mt-16"
+        className="flex-1 flex flex-col items-center justify-center relative z-10 container mx-auto px-4 sm:px-6 lg:px-8"
       >
         <motion.div variants={item} className="mb-8">
           <div className="inline-block p-2 bg-purple-100/80 backdrop-blur-sm rounded-2xl">
@@ -40,14 +40,14 @@ const Home = () => {
 
         <motion.h1 
           variants={item}
-          className="text-4xl md:text-6xl font-bold text-center bg-gradient-to-r from-gray-900 via-purple-800 to-purple-600 bg-clip-text text-transparent mb-6 max-w-4xl"
+          className="text-3xl sm:text-4xl md:text-6xl font-bold text-center bg-gradient-to-r from-gray-900 via-purple-800 to-purple-600 bg-clip-text text-transparent mb-6 max-w-4xl px-2"
         >
           Transform Your Learning Journey with AI
         </motion.h1>
 
         <motion.p 
           variants={item}
-          className="text-lg md:text-xl text-gray-600 text-center max-w-2xl mb-12"
+          className="text-base sm:text-lg md:text-xl text-gray-600 text-center max-w-2xl mb-12 px-2"
         >
           Experience personalized learning paths, interactive quizzes, and AI-generated flashcards
           tailored to your unique learning style.
@@ -84,7 +84,7 @@ const Home = () => {
 
         <motion.div
           variants={item}
-          className="mt-16 pt-8 border-t border-purple-100 grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12 max-w-3xl w-full px-4"
+          className="mt-16 pt-8 border-t border-purple-100 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8 max-w-3xl w-full px-2 sm:px-4"
         >
           {[
             { number: "10K+", label: "Active Users" },

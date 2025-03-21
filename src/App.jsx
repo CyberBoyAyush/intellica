@@ -10,7 +10,7 @@ const App = ({ children }) => {
   const showSidebar = location.pathname !== '/' && location.pathname !== '/home';
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background overflow-x-hidden">
       <Navbar isDashboard={showSidebar} />
       <div className="flex flex-1 pt-16">
         {showSidebar && <Sidebar />}

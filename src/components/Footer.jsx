@@ -10,10 +10,10 @@ const Footer = () => {
     <motion.footer 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={`bg-white/80 backdrop-blur-sm border-t border-purple-100 py-4 text-center
-        ${isDashboard ? 'relative mt-auto' : 'fixed bottom-0 w-full'}`}
+      className={`bg-white/80 backdrop-blur-sm border-t border-purple-100 py-4 text-center w-full
+        ${isDashboard ? 'relative mt-auto' : 'fixed bottom-0'}`}
     >
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between">
           <p className="text-gray-600 text-sm">
             © 2025 Intellica. Made with 💜 for learners.
