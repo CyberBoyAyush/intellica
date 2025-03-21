@@ -163,45 +163,45 @@ const Chat = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-6">
-      <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100/30 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-2 sm:p-6">
+      <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-purple-100/30 overflow-hidden">
         {/* Enhanced Header with Topic Info */}
-        <div className="p-6 border-b border-purple-100/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="p-4 sm:p-6 border-b border-purple-100/30">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <RiChat1Line className="w-6 h-6 text-purple-600" />
+                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg sm:rounded-xl">
+                  <RiChat1Line className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
                 {setupComplete && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white" />
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                   AI Chat Assistant
                 </h1>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex flex-wrap items-center gap-2 mt-1">
                   {setupComplete ? (
                     <>
-                      <span className="px-2 py-1 bg-purple-100 rounded-full text-xs text-purple-600">
+                      <span className="px-2 py-0.5 sm:py-1 bg-purple-100 rounded-full text-xs text-purple-600 max-w-[150px] sm:max-w-none truncate">
                         {context['What topic would you like to discuss today?']}
                       </span>
-                      <span className="px-2 py-1 bg-blue-100 rounded-full text-xs text-blue-600">
+                      <span className="px-2 py-0.5 sm:py-1 bg-blue-100 rounded-full text-xs text-blue-600">
                         {context["What's your current knowledge level in this topic? (Beginner/Intermediate/Advanced)"]}
                       </span>
                     </>
                   ) : (
-                    <p className="text-gray-600 text-sm flex items-center gap-2">
+                    <p className="text-sm text-gray-600 flex items-center gap-2">
                       <RiSettings4Line className="animate-spin text-purple-500" />
-                      Setting up your chat...
+                      Setting up...
                     </p>
                   )}
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-end sm:self-auto">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -224,8 +224,8 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Enhanced Messages with Better Formatting */}
-        <div className="h-[60vh] overflow-y-auto p-6 space-y-6">
+        {/* Chat Messages */}
+        <div className="h-[calc(100vh-280px)] sm:h-[60vh] overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
           <AnimatePresence>
             {messages.map((message, index) => (
               <motion.div
@@ -233,13 +233,13 @@ const Chat = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className={`flex items-start gap-4 ${
+                className={`flex items-start gap-2 sm:gap-4 ${
                   message.role === 'user' ? 'flex-row-reverse' : ''
                 }`}
               >
                 <motion.div 
                   whileHover={{ scale: 1.1 }}
-                  className={`flex-shrink-0 p-2 rounded-xl ${
+                  className={`flex-shrink-0 p-1.5 sm:p-2 rounded-lg sm:rounded-xl ${
                     message.role === 'user' 
                       ? 'bg-gradient-to-br from-purple-500 to-indigo-500' 
                       : 'bg-gradient-to-br from-gray-100 to-gray-200'
@@ -253,11 +253,11 @@ const Chat = () => {
                 </motion.div>
                 <motion.div 
                   whileHover={{ scale: 1.01 }}
-                  className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+                  className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm ${
                     message.role === 'user' 
                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white ml-auto rounded-tr-none prose prose-invert'
                       : 'bg-white text-gray-800 rounded-tl-none prose'
-                  }`}
+                  } prose-sm sm:prose-base`}
                 >
                   {formatMessage(message.content)}
                 </motion.div>
@@ -298,20 +298,20 @@ const Chat = () => {
         </div>
 
         {/* Enhanced Input Area */}
-        <div className="p-4 border-t border-purple-100/30 bg-white/50">
-          <div className="flex items-end gap-4">
+        <div className="p-3 sm:p-4 border-t border-purple-100/30 bg-white/50">
+          <div className="flex items-end gap-2 sm:gap-4">
             <div className="flex-1 bg-white rounded-xl shadow-sm">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={setupComplete ? "Type your message... (Use ```language for code blocks)" : "Type your answer..."}
-                className="w-full p-4 rounded-xl border border-purple-100 focus:border-purple-300 focus:ring-2 focus:ring-purple-200 outline-none resize-none bg-transparent"
+                className="w-full p-3 sm:p-4 rounded-xl border border-purple-100 focus:border-purple-300 focus:ring-2 focus:ring-purple-200 outline-none resize-none bg-transparent text-sm sm:text-base"
                 rows="1"
                 style={{ minHeight: '44px', maxHeight: '200px' }}
                 onInput={(e) => {
                   e.target.style.height = 'auto';
-                  e.target.style.height = e.target.scrollHeight + 'px';
+                  e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
                 }}
               />
             </div>
@@ -320,13 +320,13 @@ const Chat = () => {
               whileTap={{ scale: 0.95 }}
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl disabled:opacity-50 shadow-lg hover:shadow-purple-500/20 flex-shrink-0"
+              className="p-3 sm:p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl disabled:opacity-50 shadow-lg hover:shadow-purple-500/20 flex-shrink-0"
             >
               <RiSendPlaneFill className="w-5 h-5" />
             </motion.button>
           </div>
           {setupComplete && (
-            <p className="text-xs text-gray-500 mt-2 px-4">
+            <p className="text-xs text-gray-500 mt-2 px-2 sm:px-4 hidden sm:block">
               Tip: Use ```language followed by your code for syntax highlighting
             </p>
           )}
