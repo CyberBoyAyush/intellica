@@ -41,29 +41,32 @@ const ModuleDetails = () => {
       const moduleTitle = modules[parseInt(moduleIndex)];
 
       if (expanded) {
-        // Get additional content and merge with existing
-        const additionalContent = await generateModuleContent(moduleTitle, true);
-        if (!additionalContent?.sections?.length) {
-          throw new Error('Failed to generate expanded content');
-        }
-        
-        // Merge existing content with new content
+        // Request detailed content
+        const detailedContent = await generateModuleContent(moduleTitle, {
+          detailed: true,
+          includeExamples: true
+        });
+
+        // Merge with existing content
         setContent(prevContent => ({
           ...prevContent,
           sections: [
             ...prevContent.sections,
-            ...additionalContent.sections.map(section => ({
+            ...detailedContent.sections.map(section => ({
               ...section,
-              isNew: true // Mark new sections for animation
+              isNew: true,
+              isAdvanced: true
             }))
-          ]
+          ],
+          difficulty: 'advanced',
+          hasMoreContent: false
         }));
+        
         setIsExpanded(true);
       } else {
-        const initialContent = await generateModuleContent(moduleTitle, false);
-        if (!initialContent?.sections?.length) {
-          throw new Error('Failed to generate content');
-        }
+        const initialContent = await generateModuleContent(moduleTitle, {
+          detailed: false
+        });
         setContent(initialContent);
       }
     } catch (error) {
