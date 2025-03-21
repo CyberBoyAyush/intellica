@@ -47,32 +47,31 @@ export const getLearningPaths = async (userId) => {
   }
 };
 
-export const updateLearningPathProgress = async (pathId, completedModules) => {
+export const updateLearningPathProgress = async (pathId, progress) => {
   try {
-    const document = await databases.getDocument(
-      import.meta.env.VITE_APPWRITE_DATABASE_ID,
-      import.meta.env.VITE_COLLECTION_ID,
-      pathId
-    );
-
-    const modules = JSON.parse(document.modules);
-    const totalModules = modules.length;
-    const progress = Math.min(Math.round((completedModules / totalModules) * 100), 100);
-    const completedModulesList = document.completedModules || [];
-
     return await databases.updateDocument(
       import.meta.env.VITE_APPWRITE_DATABASE_ID,
       import.meta.env.VITE_COLLECTION_ID,
       pathId,
       {
-        progress,
-        completedModules: completedModulesList.includes(completedModules - 1) 
-          ? completedModulesList 
-          : [...completedModulesList, completedModules - 1],
-        lastUpdated: new Date().toISOString()
+        progress: Math.min(progress, 100), // Ensure progress doesn't exceed 100
       }
     );
   } catch (error) {
+    console.error('Progress update error:', error);
     throw new Error('Failed to update progress');
+  }
+};
+
+export const deleteLearningPath = async (pathId) => {
+  try {
+    await databases.deleteDocument(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      import.meta.env.VITE_COLLECTION_ID,
+      pathId
+    );
+  } catch (error) {
+    console.error('Delete error:', error);
+    throw new Error('Failed to delete learning path');
   }
 };

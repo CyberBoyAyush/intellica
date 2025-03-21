@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { account } from '../config/appwrite';
 import { generateLearningPath } from '../config/gemini';
-import { createLearningPath, getLearningPaths } from '../config/database';
+import { createLearningPath, getLearningPaths, deleteLearningPath } from '../config/database';
 import { useNavigate } from 'react-router-dom';
 
 const LearningPath = () => {
@@ -11,6 +11,7 @@ const LearningPath = () => {
   const [showModal, setShowModal] = useState(false);
   const [topicName, setTopicName] = useState('');
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,6 +50,16 @@ const LearningPath = () => {
     }
   };
 
+  const handleDelete = async (e, pathId) => {
+    e.stopPropagation(); // Prevent navigation when clicking delete
+    try {
+      await deleteLearningPath(pathId);
+      await fetchPaths(); // Refresh the list
+    } catch (error) {
+      setError('Failed to delete learning path');
+    }
+  };
+
   return (
     <div className="flex-1">
       <div className="bg-white rounded-lg p-6 shadow-lg">
@@ -71,9 +82,19 @@ const LearningPath = () => {
             <motion.div
               key={index}
               whileHover={{ scale: 1.01 }}
+              className="bg-purple-50 p-6 rounded-lg cursor-pointer relative group"
               onClick={() => navigate(`/learning-path/${path.$id}`)}
-              className="bg-purple-50 p-6 rounded-lg cursor-pointer"
             >
+              <motion.button
+                className="absolute top-4 right-4 p-2 bg-red-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => handleDelete(e, path.$id)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </motion.button>
               <h2 className="text-xl font-semibold text-purple-700 mb-2">{path.topicName}</h2>
               <div className="w-full bg-purple-200 rounded-full h-2.5">
                 <div 

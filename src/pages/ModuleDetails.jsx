@@ -30,7 +30,9 @@ const ModuleDetails = () => {
         const moduleContent = await generateModuleContent(moduleTitle);
         
         setContent(moduleContent);
-        setIsCompleted(response.completedModules?.includes(parseInt(moduleIndex)) || false);
+        // Check if current module is completed based on progress
+        const moduleProgress = (parseInt(moduleIndex) + 1) / modules.length * 100;
+        setIsCompleted(response.progress >= moduleProgress);
       } catch (error) {
         setError('Failed to load module content');
       } finally {
@@ -43,7 +45,16 @@ const ModuleDetails = () => {
 
   const handleComplete = async () => {
     try {
-      await updateLearningPathProgress(pathId, parseInt(moduleIndex) + 1);
+      const response = await databases.getDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        import.meta.env.VITE_COLLECTION_ID,
+        pathId
+      );
+      
+      // Calculate new progress by adding 20% (100/5 modules)
+      const newProgress = Math.min((response.progress || 0) + 20, 100);
+      
+      await updateLearningPathProgress(pathId, newProgress);
       setIsCompleted(true);
       setTimeout(() => {
         navigate(`/learning-path/${pathId}`);
