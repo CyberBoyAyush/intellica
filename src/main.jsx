@@ -7,6 +7,11 @@ import Dashboard from "./pages/Dashboard";
 import LearningPath from "./pages/LearningPath";
 import Quiz from "./pages/Quiz";
 import Flashcards from "./pages/Flashcards";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LearningPathDetails from "./pages/LearningPathDetails";
+import ModuleDetails from "./pages/ModuleDetails";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -14,10 +19,38 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <App>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/learning-path" element={<LearningPath />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/learning-path" element={
+            <ProtectedRoute>
+              <LearningPath />
+            </ProtectedRoute>
+          } />
+          <Route path="/learning-path/:id" element={
+            <ProtectedRoute>
+              <LearningPathDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="/quiz" element={
+            <ProtectedRoute>
+              <Quiz />
+            </ProtectedRoute>
+          } />
+          <Route path="/flashcards" element={
+            <ProtectedRoute>
+              <Flashcards />
+            </ProtectedRoute>
+          } />
+          <Route path="/learning-path/:pathId/module/:moduleIndex" element={
+            <ProtectedRoute>
+              <ModuleDetails />
+            </ProtectedRoute>
+          } />
         </Routes>
       </App>
     </Router>

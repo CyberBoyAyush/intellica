@@ -6,11 +6,11 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    navigate("/dashboard");
+    navigate("/login");  // Changed from /dashboard to /login
   };
 
   const handleSignup = () => {
-    navigate("/dashboard");
+    navigate("/signup");  // Changed from /dashboard to /signup
   };
 
   const handleLogout = () => {
