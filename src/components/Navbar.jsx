@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { getUserProgress } from "../config/database";
 import { useAuth } from "../context/AuthContext";
-import { RiFireFill } from "react-icons/ri";
+import { RiFireFill, RiBrainLine } from "react-icons/ri";
 import { format, differenceInDays, parseISO } from "date-fns";
 
 const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
@@ -197,10 +197,10 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
             transition={{ duration: 2, repeat: Infinity }}
             className="w-8 h-8 bg-gradient-to-tr from-purple-600 to-purple-400 rounded-lg flex items-center justify-center"
           >
-            <span className="text-white font-bold">I</span>
+            <RiBrainLine className="text-white text-xl" />
           </motion.div>
           <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-            Intellica
+            INTELLICA
           </span>
         </motion.div>
       </div>
