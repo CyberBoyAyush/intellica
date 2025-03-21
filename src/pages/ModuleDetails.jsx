@@ -5,6 +5,9 @@ import { generateModuleContent } from '../config/gemini';
 import { updateLearningPathProgress } from '../config/database';
 import client from '../config/appwrite';
 import { Databases } from 'appwrite';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const ModuleDetails = () => {
   const { pathId, moduleIndex } = useParams();
@@ -13,34 +16,33 @@ const ModuleDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const databases = new Databases(client);
 
+  const loadContent = async (expanded = false) => {
+    try {
+      setLoading(true);
+      const response = await databases.getDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        import.meta.env.VITE_COLLECTION_ID,
+        pathId
+      );
+
+      const modules = JSON.parse(response.modules);
+      const moduleTitle = modules[parseInt(moduleIndex)];
+      const moduleContent = await generateModuleContent(moduleTitle, expanded);
+      
+      setContent(moduleContent);
+      setIsExpanded(expanded);
+    } catch (error) {
+      setError('Failed to load module content');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadContent = async () => {
-      try {
-        setLoading(true);
-        const response = await databases.getDocument(
-          import.meta.env.VITE_APPWRITE_DATABASE_ID,
-          import.meta.env.VITE_COLLECTION_ID,
-          pathId
-        );
-
-        const modules = JSON.parse(response.modules);
-        const moduleTitle = modules[parseInt(moduleIndex)];
-        const moduleContent = await generateModuleContent(moduleTitle);
-        
-        setContent(moduleContent);
-        // Check if current module is completed based on progress
-        const moduleProgress = (parseInt(moduleIndex) + 1) / modules.length * 100;
-        setIsCompleted(response.progress >= moduleProgress);
-      } catch (error) {
-        setError('Failed to load module content');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadContent();
+    loadContent(false);
   }, [pathId, moduleIndex]);
 
   const handleComplete = async () => {
@@ -72,9 +74,34 @@ const ModuleDetails = () => {
     return <div className="text-red-500 text-center">{error}</div>;
   }
 
+  // Custom renderer for code blocks
+  const renderers = {
+    code({ node, inline, className, children, ...props }) {
+      const match = /language-(\w+)/.exec(className || '');
+      return !inline && match ? (
+        <div className="my-4">
+          <SyntaxHighlighter
+            style={vscDarkPlus}
+            language={match[1]}
+            PreTag="div"
+            className="rounded-lg"
+            {...props}
+          >
+            {String(children).replace(/\n$/, '')}
+          </SyntaxHighlighter>
+        </div>
+      ) : (
+        <code className="bg-purple-50 px-2 py-1 rounded" {...props}>
+          {children}
+        </code>
+      );
+    }
+  };
+
   return (
     <div className="flex-1">
       <div className="bg-white rounded-lg p-6 shadow-lg">
+        {/* Header section */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -88,30 +115,49 @@ const ModuleDetails = () => {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="prose prose-purple max-w-none"
-        >
-          <div className="space-y-6">
+        {/* Content section */}
+        <motion.div className="prose prose-purple max-w-none">
+          <div className="space-y-8">
             {content?.sections.map((section, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 + 0.3 }}
+                className="bg-purple-50/50 p-6 rounded-lg"
               >
-                <h2 className="text-xl font-semibold text-purple-700 mb-3">
+                <h2 className="text-xl font-semibold text-purple-700 mb-4">
                   {section.title}
                 </h2>
-                <p className="text-gray-600">
-                  {section.content}
-                </p>
+                
+                <div className="text-gray-600">
+                  <ReactMarkdown components={renderers}>
+                    {section.content}
+                  </ReactMarkdown>
+                </div>
+
+                {section.codeExample && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-medium text-purple-600 mb-2">
+                      Code Example:
+                    </h3>
+                    <SyntaxHighlighter
+                      language={section.codeExample.language}
+                      style={vscDarkPlus}
+                      className="rounded-lg"
+                    >
+                      {section.codeExample.code}
+                    </SyntaxHighlighter>
+                    <p className="mt-2 text-gray-600">
+                      {section.codeExample.explanation}
+                    </p>
+                  </div>
+                )}
+
                 {section.keyPoints && (
-                  <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4">
+                  <ul className="mt-4 list-disc list-inside space-y-2 text-gray-600">
                     {section.keyPoints.map((point, i) => (
-                      <li key={i}>{point}</li>
+                      <li key={i} className="ml-4">{point}</li>
                     ))}
                   </ul>
                 )}
@@ -120,12 +166,19 @@ const ModuleDetails = () => {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 flex justify-end"
-        >
+        {/* Action buttons */}
+        <motion.div className="mt-8 flex justify-between items-center">
+          {content?.hasMoreContent && !isExpanded && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => loadContent(true)}
+              className="px-6 py-3 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200"
+            >
+              Read More
+            </motion.button>
+          )}
+          
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

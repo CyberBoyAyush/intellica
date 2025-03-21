@@ -33,23 +33,31 @@ export const generateLearningPath = async (topic) => {
   }
 };
 
-export const generateModuleContent = async (moduleName) => {
+export const generateModuleContent = async (moduleName, isExpanded = false) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    const prompt = `Create detailed content for module: "${moduleName}".
-    Structure as:
+    const prompt = `Create detailed ${isExpanded ? 'expanded' : 'concise'} content for: "${moduleName}".
+    Format as JSON with markdown formatting:
     {
       "title": "${moduleName}",
       "sections": [
         {
           "title": "section title",
-          "content": "detailed explanation",
-          "keyPoints": ["key point 1", "key point 2"]
+          "content": "detailed explanation with **bold**, *italic*, and ## headings",
+          "keyPoints": ["key point 1", "key point 2"],
+          "codeExample": {
+            "language": "javascript/python/etc",
+            "code": "actual code here",
+            "explanation": "code explanation"
+          }
         }
       ],
-      "summary": "brief module summary"
-    }`;
+      "summary": "brief summary",
+      "hasMoreContent": boolean
+    }
+    If topic involves programming, include relevant code examples in each section.
+    Use markdown formatting for text emphasis and structure.`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
