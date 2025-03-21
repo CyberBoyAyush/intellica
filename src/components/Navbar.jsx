@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ isDashboard }) => {
+const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -24,23 +24,46 @@ const Navbar = ({ isDashboard }) => {
       transition={{ type: "spring", stiffness: 100 }}
       className="bg-white/80 backdrop-blur-md border-b border-purple-100 px-4 md:px-8 py-4 flex justify-between items-center fixed top-0 w-full z-[999]"
     >
-      <motion.div 
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="flex items-center gap-2 cursor-pointer"
-        onClick={() => navigate('/')}
-      >
+      <div className="flex items-center gap-4">
+        {isDashboard && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 hover:bg-purple-50 rounded-lg"
+          >
+            <svg 
+              className="w-6 h-6 text-purple-600" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              {isSidebarOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </motion.button>
+        )}
         <motion.div 
-          animate={{ rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-8 h-8 bg-gradient-to-tr from-purple-600 to-purple-400 rounded-lg flex items-center justify-center"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => navigate('/')}
         >
-          <span className="text-white font-bold">I</span>
+          <motion.div 
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-8 h-8 bg-gradient-to-tr from-purple-600 to-purple-400 rounded-lg flex items-center justify-center"
+          >
+            <span className="text-white font-bold">I</span>
+          </motion.div>
+          <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+            Intellica
+          </span>
         </motion.div>
-        <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-          Intellica
-        </span>
-      </motion.div>
+      </div>
 
       {isDashboard ? (
         <div className="flex items-center gap-3 md:gap-6">

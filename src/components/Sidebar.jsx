@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -46,23 +46,31 @@ const Sidebar = () => {
   return (
     <motion.div
       initial={{ x: -250 }}
-      animate={{ x: 0 }}
-      className="w-64 h-screen bg-white border-r border-purple-100 fixed left-0 top-0 z-[998]"
+      animate={{ 
+        x: isOpen ? 0 : -250,
+        width: isOpen ? 256 : 0
+      }}
+      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      className="h-screen bg-white border-r border-purple-100 fixed left-0 top-0 z-[998] overflow-hidden"
     >
-      <div className="p-4 space-y-2">
+      <div className="p-4 space-y-2 pt-20 min-w-[256px]">
         {menuItems.map((item, index) => (
           <motion.div
             key={index}
             whileHover={{ scale: 1.02 }}
-            onClick={() => handleNavigation(item.path)}
-            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
-              item.active 
+            onClick={() => {
+              handleNavigation(item.path);
+              if (window.innerWidth < 768) setIsOpen(false);
+            }}
+            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors
+              ${item.active 
                 ? "bg-purple-100 text-purple-600" 
                 : "hover:bg-purple-50"
-            }`}
+              }
+              sm:px-4 sm:py-3`}
           >
-            <span className="text-xl">{item.icon}</span>
-            <span className="font-medium">{item.label}</span>
+            <span className="text-xl sm:text-2xl">{item.icon}</span>
+            <span className="font-medium text-sm sm:text-base">{item.label}</span>
           </motion.div>
         ))}
       </div>
