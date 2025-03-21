@@ -168,34 +168,6 @@ const Dashboard = () => {
             </motion.div>
           ))}
         </div>
-
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
-        >
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Recent Activity
-          </h2>
-          <div className="space-y-4">
-            {[1, 2, 3].map((_, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg"
-              >
-                <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                <div className="flex-1">
-                  <p className="text-gray-800">Completed Python Basics Quiz</p>
-                  <p className="text-sm text-gray-500">2 hours ago</p>
-                </div>
-                <div className="text-sm font-medium text-purple-600">
-                  Score: 90%
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       </motion.div>
     </div>
   );

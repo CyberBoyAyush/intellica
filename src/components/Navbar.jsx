@@ -1,12 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { getUserProgress } from "../config/database";
 import { useAuth } from "../context/AuthContext";
+import { RiFireFill } from "react-icons/ri";
+import { format, differenceInDays, parseISO } from "date-fns";
 
 const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { user, loading, logout, isAuthenticated } = useAuth();
+
+  const [currentStreak, setCurrentStreak] = useState(0);
+
+  useEffect(() => {
+    if (user) fetchUserProgress();
+  }, [user]);
+
+  const fetchUserProgress = async () => {
+    try {
+      const progress = await getUserProgress(user.$id);
+      let quizScores = [];
+
+      if (progress.quizScores) {
+        quizScores = Array.isArray(progress.quizScores)
+          ? progress.quizScores
+          : JSON.parse(progress.quizScores);
+      }
+
+      calculateCurrentStreak(quizScores);
+    } catch (error) {
+      console.error("Error fetching quiz scores:", error);
+    }
+  };
+
+  const calculateCurrentStreak = (quizScores) => {
+    if (!quizScores.length) return;
+
+    const dates = quizScores.map((q) => format(parseISO(q.date), "yyyy-MM-dd"));
+    const sortedDates = [...new Set(dates)].sort();
+
+    let tempStreak = 1;
+    for (let i = 1; i < sortedDates.length; i++) {
+      const diff = differenceInDays(
+        parseISO(sortedDates[i]),
+        parseISO(sortedDates[i - 1])
+      );
+      if (diff === 1) tempStreak++;
+      else tempStreak = 1;
+    }
+
+    const today = format(new Date(), "yyyy-MM-dd");
+    const lastQuizDate = sortedDates[sortedDates.length - 1];
+    const daysSinceLastQuiz = differenceInDays(
+      parseISO(today),
+      parseISO(lastQuizDate)
+    );
+
+    setCurrentStreak(daysSinceLastQuiz <= 1 ? tempStreak : 0);
+  };
 
   const handleLogin = () => {
     navigate("/login");
@@ -17,7 +69,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
   };
 
   const handleLogout = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const getUserDisplay = () => {
@@ -35,10 +87,10 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
     return (
       <>
         <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
-          {user.$id ? user.$id[0].toUpperCase() : '👤'}
+          {user.$id ? user.$id[0].toUpperCase() : "👤"}
         </div>
         <span className="text-gray-700 font-medium">
-          {user.name || user.email?.split('@')[0] || user.$id}
+          {user.name || user.email?.split("@")[0] || user.$id}
         </span>
       </>
     );
@@ -55,15 +107,15 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
         >
           <div className="px-4 py-2 border-b border-purple-100">
             <p className="text-sm font-medium text-gray-900">
-              {user?.name || user?.email?.split('@')[0]}
+              {user?.name || user?.email?.split("@")[0]}
             </p>
             <p className="text-xs text-gray-500 truncate">{user?.email}</p>
           </div>
-          
+
           {[
-            { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
-            { label: 'Profile', path: '/settings', icon: '👤' },
-            { label: 'Progress', path: '/progress', icon: '📊' },
+            { label: "Dashboard", path: "/dashboard", icon: "🏠" },
+            { label: "Profile", path: "/settings", icon: "👤" },
+            { label: "Progress", path: "/progress", icon: "📊" },
           ].map((item) => (
             <motion.button
               key={item.path}
@@ -78,7 +130,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
               {item.label}
             </motion.button>
           ))}
-          
+
           <motion.button
             whileHover={{ x: 2 }}
             onClick={() => {
@@ -96,7 +148,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
   );
 
   return (
-    <motion.nav 
+    <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100 }}
@@ -110,27 +162,37 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 hover:bg-purple-50 rounded-lg"
           >
-            <svg 
-              className="w-6 h-6 text-purple-600" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-6 h-6 text-purple-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               {isSidebarOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </svg>
           </motion.button>
         )}
-        <motion.div 
+        <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
         >
-          <motion.div 
+          <motion.div
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
             className="w-8 h-8 bg-gradient-to-tr from-purple-600 to-purple-400 rounded-lg flex items-center justify-center"
@@ -145,39 +207,61 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
 
       {isAuthenticated ? (
         <div className="flex items-center gap-3 md:gap-6">
+          <span className="flex gap-1">
+            {" "}
+            <RiFireFill className="text-2xl text-amber-500" />
+            {currentStreak}
+          </span>
           <div className="relative">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.02 }}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="hidden md:flex items-center gap-3 bg-purple-50 px-4 py-2 rounded-xl cursor-pointer"
             >
               <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
-                {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '👤'}
+                {user?.name?.[0]?.toUpperCase() ||
+                  user?.email?.[0]?.toUpperCase() ||
+                  "👤"}
               </div>
               <span className="text-gray-700 font-medium flex items-center gap-2">
-                {user?.name || user?.email?.split('@')[0] || 'Loading...'}
-                <motion.svg 
+                {user?.name || user?.email?.split("@")[0] || "Loading..."}
+                <motion.svg
                   animate={{ rotate: isDropdownOpen ? 180 : 0 }}
                   className="w-4 h-4 text-gray-600"
-                  fill="none" 
-                  stroke="currentColor" 
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </motion.svg>
               </span>
             </motion.div>
             <UserDropdown />
           </div>
 
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="md:hidden p-2 bg-purple-100 text-purple-600 rounded-lg"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </motion.button>
         </div>
@@ -206,7 +290,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
         {isDropdownOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden fixed top-[72px] left-0 right-0 bg-white border-b border-purple-100 shadow-lg"
           >
@@ -215,14 +299,16 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
                 <>
                   <div className="px-4 py-2 border-b border-purple-100">
                     <p className="text-sm font-medium text-gray-900">
-                      {user?.name || user?.email?.split('@')[0]}
+                      {user?.name || user?.email?.split("@")[0]}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {user?.email}
+                    </p>
                   </div>
                   {[
-                    { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
-                    { label: 'Profile', path: '/settings', icon: '👤' },
-                    { label: 'Progress', path: '/progress', icon: '📊' },
+                    { label: "Dashboard", path: "/dashboard", icon: "🏠" },
+                    { label: "Profile", path: "/settings", icon: "👤" },
+                    { label: "Progress", path: "/progress", icon: "📊" },
                   ].map((item) => (
                     <motion.button
                       key={item.path}
@@ -251,10 +337,16 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
                 </>
               ) : (
                 <>
-                  <button onClick={handleLogin} className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg">
+                  <button
+                    onClick={handleLogin}
+                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg"
+                  >
                     Login
                   </button>
-                  <button onClick={handleSignup} className="w-full px-4 py-2 border border-purple-600 text-purple-600 rounded-lg">
+                  <button
+                    onClick={handleSignup}
+                    className="w-full px-4 py-2 border border-purple-600 text-purple-600 rounded-lg"
+                  >
                     Sign Up
                   </button>
                 </>
