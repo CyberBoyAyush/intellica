@@ -22,6 +22,19 @@ const ModuleDetails = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const databases = new Databases(client);
 
+  // Add new helper function to check if topic is code-related
+  const isCodeRelatedTopic = (title) => {
+    const codeKeywords = [
+      'programming', 'javascript', 'python', 'java', 'code',
+      'development', 'react', 'angular', 'vue', 'node',
+      'typescript', 'api', 'database', 'sql', 'html',
+      'css', 'frontend', 'backend', 'fullstack', 'software'
+    ];
+    return codeKeywords.some(keyword => 
+      title.toLowerCase().includes(keyword.toLowerCase())
+    );
+  };
+
   const loadContent = async (expanded = false) => {
     try {
       if (expanded) {
@@ -39,12 +52,14 @@ const ModuleDetails = () => {
 
       const modules = JSON.parse(response.modules);
       const moduleTitle = modules[parseInt(moduleIndex)];
+      const isCodeTopic = isCodeRelatedTopic(moduleTitle);
 
       if (expanded) {
         // Request detailed content
         const detailedContent = await generateModuleContent(moduleTitle, {
           detailed: true,
-          includeExamples: true
+          includeExamples: true,
+          includeCode: isCodeTopic // Only include code examples for code-related topics
         });
 
         // Merge with existing content
@@ -65,7 +80,8 @@ const ModuleDetails = () => {
         setIsExpanded(true);
       } else {
         const initialContent = await generateModuleContent(moduleTitle, {
-          detailed: false
+          detailed: false,
+          includeCode: isCodeTopic
         });
         setContent(initialContent);
       }
@@ -209,7 +225,8 @@ const ModuleDetails = () => {
                 </ReactMarkdown>
               </div>
 
-              {section.codeExample && (
+              {/* Only render code example if it exists and topic is code-related */}
+              {section.codeExample && isCodeRelatedTopic(content.title) && (
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
