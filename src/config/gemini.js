@@ -309,3 +309,25 @@ export const generateQuizData = async (topic, numQuestions = 5) => {
     throw new Error(`Failed to generate quiz: ${error.message}`);
   }
 };
+
+export const generateChatResponse = async (message, context) => {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    
+    // Create context-aware prompt
+    const contextPrompt = `
+      Context:
+      Topic: ${context['What topic would you like to discuss today?'] || 'General'}
+      Level: ${context["What's your current knowledge level in this topic? (Beginner/Intermediate/Advanced)"] || 'Intermediate'}
+      Focus: ${context['What specific aspects would you like to focus on?'] || 'General understanding'}
+      
+      Be concise and helpful. Answer the following: ${message}
+    `;
+
+    const result = await model.generateContent(contextPrompt);
+    return result.response.text();
+  } catch (error) {
+    console.error('Chat generation error:', error);
+    throw new Error('Failed to generate response');
+  }
+};
