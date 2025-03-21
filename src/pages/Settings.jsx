@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { RiUserLine, RiMailLine, RiSaveLine, RiEditLine } from "react-icons/ri";
+import { RiUserLine, RiMailLine, RiSaveLine, RiEditLine, RiMedalLine, RiTimeLine, RiFireLine } from "react-icons/ri";
 import { account } from "../config/appwrite";
 import QuizStreak from "./Streak";
 import { getUserProgress } from "../config/database";
@@ -208,7 +208,79 @@ const Settings = () => {
           </form>
         </motion.div>
       </motion.div>
-      <QuizStreak quizScores={quizScores} />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto mt-8 space-y-6"
+      >
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <motion.div 
+            whileHover={{ y: -2 }}
+            className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-100/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <RiMedalLine className="text-purple-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Total Quizzes</p>
+                <p className="text-xl font-bold text-purple-600">{quizScores.length}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            whileHover={{ y: -2 }}
+            className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-100/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <RiFireLine className="text-indigo-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Current Streak</p>
+                <p className="text-xl font-bold text-indigo-600">5 days</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            whileHover={{ y: -2 }}
+            className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-100/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-pink-100 rounded-lg">
+                <RiTimeLine className="text-pink-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Learning Time</p>
+                <p className="text-xl font-bold text-pink-600">12.5 hrs</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Streak Calendar Card */}
+        <motion.div 
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: "spring", stiffness: 300 }}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-purple-100/30"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              Your Learning Streak
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+              <RiFireLine className="text-orange-500" />
+              <span>Keep it up!</span>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <QuizStreak quizScores={quizScores} />
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };
