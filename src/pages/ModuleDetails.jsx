@@ -22,16 +22,18 @@ const ModuleDetails = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const databases = new Databases(client);
 
-  // Add new helper function to check if topic is code-related
-  const isCodeRelatedTopic = (title) => {
-    const codeKeywords = [
-      'programming', 'javascript', 'python', 'java', 'code',
-      'development', 'react', 'angular', 'vue', 'node',
-      'typescript', 'api', 'database', 'sql', 'html',
-      'css', 'frontend', 'backend', 'fullstack', 'software'
-    ];
-    return codeKeywords.some(keyword => 
-      title.toLowerCase().includes(keyword.toLowerCase())
+  const isCodeRelatedTopic = (title = '') => {
+    const techKeywords = {
+      programming: ['javascript', 'python', 'java', 'coding', 'programming', 'typescript'],
+      web: ['html', 'css', 'react', 'angular', 'vue', 'frontend', 'backend', 'fullstack'],
+      database: ['sql', 'database', 'mongodb', 'postgres'],
+      software: ['api', 'development', 'software', 'git', 'devops', 'algorithms'],
+      tech: ['computer science', 'data structures', 'networking', 'cloud']
+    };
+
+    const lowerTitle = title.toLowerCase();
+    return Object.values(techKeywords).some(category => 
+      category.some(keyword => lowerTitle.includes(keyword))
     );
   };
 
@@ -52,19 +54,19 @@ const ModuleDetails = () => {
 
       const modules = JSON.parse(response.modules);
       const moduleTitle = modules[parseInt(moduleIndex)];
-      const isCodeTopic = isCodeRelatedTopic(moduleTitle);
+      const isTechTopic = isCodeRelatedTopic(moduleTitle);
 
       if (expanded) {
-        // Request detailed content
         const detailedContent = await generateModuleContent(moduleTitle, {
           detailed: true,
-          includeExamples: true,
-          includeCode: isCodeTopic // Only include code examples for code-related topics
+          includeExamples: true
         });
 
-        // Merge with existing content
+        console.log('Generated content:', detailedContent); // For debugging
+
         setContent(prevContent => ({
           ...prevContent,
+          type: detailedContent.type, // Ensure type is preserved
           sections: [
             ...prevContent.sections,
             ...detailedContent.sections.map(section => ({
@@ -77,13 +79,14 @@ const ModuleDetails = () => {
           hasMoreContent: false
         }));
         
-        setIsExpanded(true);
       } else {
         const initialContent = await generateModuleContent(moduleTitle, {
-          detailed: false,
-          includeCode: isCodeTopic
+          detailed: false
         });
-        setContent(initialContent);
+        setContent({
+          ...initialContent,
+          hasMoreContent: true
+        });
       }
     } catch (error) {
       console.error('Content loading error:', error);
@@ -226,7 +229,7 @@ const ModuleDetails = () => {
               </div>
 
               {/* Only render code example if it exists and topic is code-related */}
-              {section.codeExample && isCodeRelatedTopic(content.title) && (
+              {section.codeExample && content.type === 'technical' && (
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -244,9 +247,17 @@ const ModuleDetails = () => {
                     language={section.codeExample.language}
                     style={vscDarkPlus}
                     className="!m-0"
+                    showLineNumbers
                   >
                     {section.codeExample.code}
                   </SyntaxHighlighter>
+                  {section.codeExample.explanation && (
+                    <div className="px-4 py-3 bg-gray-800/50 border-t border-gray-700">
+                      <p className="text-sm text-gray-300">
+                        {section.codeExample.explanation}
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </motion.div>
