@@ -1,34 +1,74 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
+import { FlashcardArray } from "react-quizlet-flashcard";
 import { motion } from "framer-motion";
 
 const Flashcards = () => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const manualFlipRef = useRef(null); // Reference for manual flip control
+
+  const cards = [
+    {
+      id: 1,
+      frontHTML: "What is the capital of Alaska?",
+      backHTML: "Juneau",
+    },
+    {
+      id: 2,
+      frontHTML: "What is the capital of California?",
+      backHTML: "Sacramento",
+    },
+    {
+      id: 3,
+      frontHTML: "What is the capital of New York?",
+      backHTML: "Albany",
+    },
+    {
+      id: 4,
+      frontHTML: "What is the capital of Florida?",
+      backHTML: "Tallahassee",
+    },
+    { id: 5, frontHTML: "What is the capital of Texas?", backHTML: "Austin" },
+    {
+      id: 6,
+      frontHTML: "What is the capital of New Mexico?",
+      backHTML: "Santa Fe",
+    },
+    {
+      id: 7,
+      frontHTML: "What is the capital of Arizona?",
+      backHTML: "Phoenix",
+    },
+  ];
 
   return (
-    <div className="flex-1">
-      <div className="bg-white rounded-lg p-6 shadow-lg">
+    <motion.div
+      className="flex justify-center min-h-screen p-6 "
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className=" text-center">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent mb-6">
           Flashcards
         </h1>
-        <div className="flex justify-center">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="w-full max-w-lg aspect-video bg-purple-50 rounded-xl shadow-lg cursor-pointer"
-            onClick={() => setIsFlipped(!isFlipped)}
-          >
-            <div className="h-full flex items-center justify-center p-8">
-              <h2 className="text-2xl font-semibold text-purple-700 text-center">
-                {isFlipped ? "Answer goes here" : "Question goes here"}
-              </h2>
-            </div>
-          </motion.div>
-        </div>
-        <div className="flex justify-center gap-4 mt-6">
-          <button className="px-6 py-2 bg-purple-600 text-white rounded-lg">Previous</button>
-          <button className="px-6 py-2 bg-purple-600 text-white rounded-lg">Next</button>
-        </div>
+
+        <motion.div
+          className="flex justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <FlashcardArray
+            cards={cards}
+            className="text-stone-900"
+            borderRadius="1rem"
+            height="320px"
+            width="500px"
+            style={{ boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)" }}
+            manualFlipRef={manualFlipRef}
+          />
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
