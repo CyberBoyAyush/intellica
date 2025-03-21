@@ -10,7 +10,7 @@ const Sidebar = () => {
     { 
       icon: "🎯", 
       label: "Learning Paths",
-      path: "/earning-paths",
+      path: "/learning-path",
       active: location.pathname.includes('learning-paths')
     },
     { 
