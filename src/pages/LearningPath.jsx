@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { account } from '../config/appwrite';
 import { generateLearningPath } from '../config/gemini';
 import { createLearningPath, getLearningPaths } from '../config/database';
+import { useNavigate } from 'react-router-dom';
 
 const LearningPath = () => {
   const [paths, setPaths] = useState([]);
@@ -10,6 +11,7 @@ const LearningPath = () => {
   const [showModal, setShowModal] = useState(false);
   const [topicName, setTopicName] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPaths();
@@ -69,14 +71,15 @@ const LearningPath = () => {
             <motion.div
               key={index}
               whileHover={{ scale: 1.01 }}
-              className="bg-purple-50 p-6 rounded-lg"
+              onClick={() => navigate(`/learning-path/${path.$id}`)}
+              className="bg-purple-50 p-6 rounded-lg cursor-pointer"
             >
-              <h2 className="text-xl font-semibold text-purple-700 mb-2">{path.title}</h2>
+              <h2 className="text-xl font-semibold text-purple-700 mb-2">{path.topicName}</h2>
               <div className="w-full bg-purple-200 rounded-full h-2.5">
                 <div 
                   className="bg-purple-600 h-2.5 rounded-full transition-all duration-500"
                   style={{ width: `${path.progress}%` }}
-                ></div>
+                />
               </div>
               <p className="text-gray-600 mt-2">{path.progress}% Complete</p>
             </motion.div>
