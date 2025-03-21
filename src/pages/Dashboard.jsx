@@ -31,8 +31,6 @@ const Dashboard = () => {
           parsedQuizScores = Array.isArray(progress.quizScores)
             ? progress.quizScores // If already an array, use it directly
             : JSON.parse(progress.quizScores); // Otherwise, parse it
-
-          console.log(parsedQuizScores);
         } catch (error) {
           console.error("Error parsing quizScores JSON:", error);
         }
