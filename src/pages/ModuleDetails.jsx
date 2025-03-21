@@ -19,11 +19,16 @@ const ModuleDetails = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedContent, setExpandedContent] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const databases = new Databases(client);
 
   const loadContent = async (expanded = false) => {
     try {
-      setLoading(true);
+      if (expanded) {
+        setIsLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
       setError('');
 
       const response = await databases.getDocument(
@@ -35,23 +40,24 @@ const ModuleDetails = () => {
       const modules = JSON.parse(response.modules);
       const moduleTitle = modules[parseInt(moduleIndex)];
 
-      // Add loading state for content
-      setContent({
-        title: moduleTitle,
-        sections: [{
-          title: "Loading...",
-          content: "Preparing your content...",
-          keyPoints: [],
-          codeExample: null
-        }]
-      });
-
       if (expanded) {
+        // Get additional content and merge with existing
         const additionalContent = await generateModuleContent(moduleTitle, true);
         if (!additionalContent?.sections?.length) {
           throw new Error('Failed to generate expanded content');
         }
-        setExpandedContent(additionalContent);
+        
+        // Merge existing content with new content
+        setContent(prevContent => ({
+          ...prevContent,
+          sections: [
+            ...prevContent.sections,
+            ...additionalContent.sections.map(section => ({
+              ...section,
+              isNew: true // Mark new sections for animation
+            }))
+          ]
+        }));
         setIsExpanded(true);
       } else {
         const initialContent = await generateModuleContent(moduleTitle, false);
@@ -63,9 +69,9 @@ const ModuleDetails = () => {
     } catch (error) {
       console.error('Content loading error:', error);
       setError('Failed to load content. Please try again.');
-      setContent(null);
     } finally {
       setLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -180,10 +186,15 @@ const ModuleDetails = () => {
           {content?.sections.map((section, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={section.isNew ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl border border-purple-100/30 shadow-lg hover:shadow-xl transition-all duration-300"
+              transition={{ 
+                delay: section.isNew ? 0.2 : index * 0.1,
+                duration: 0.5
+              }}
+              className={`bg-white/70 backdrop-blur-sm p-8 rounded-2xl border border-purple-100/30 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                section.isNew ? 'border-l-4 border-l-purple-500' : ''
+              }`}
             >
               <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6 flex items-center gap-3">
                 <span>{section.title}</span>
@@ -325,10 +336,24 @@ const ModuleDetails = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => loadContent(true)}
+              disabled={isLoadingMore}
               className="px-6 py-3 bg-purple-100 text-purple-600 rounded-xl hover:bg-purple-200 transition-colors flex items-center gap-2"
             >
-              Read More
-              <RiArrowRightLine />
+              {isLoadingMore ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-purple-600/30 border-t-purple-600 rounded-full"
+                  />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Read More
+                  <RiArrowRightLine />
+                </>
+              )}
             </motion.button>
           )}
           
