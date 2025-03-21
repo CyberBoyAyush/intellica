@@ -1,18 +1,19 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, isAuthenticated } = useAuth();
 
   const handleLogin = () => {
-    navigate("/login");  // Changed from /dashboard to /login
+    navigate("/login");
   };
 
   const handleSignup = () => {
-    navigate("/signup");  // Changed from /dashboard to /signup
+    navigate("/signup");
   };
 
   const handleLogout = () => {
@@ -42,6 +43,57 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
       </>
     );
   };
+
+  const UserDropdown = () => (
+    <AnimatePresence>
+      {isDropdownOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 border border-purple-100"
+        >
+          <div className="px-4 py-2 border-b border-purple-100">
+            <p className="text-sm font-medium text-gray-900">
+              {user?.name || user?.email?.split('@')[0]}
+            </p>
+            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+          </div>
+          
+          {[
+            { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
+            { label: 'Profile', path: '/settings', icon: '👤' },
+            { label: 'Progress', path: '/progress', icon: '📊' },
+          ].map((item) => (
+            <motion.button
+              key={item.path}
+              whileHover={{ x: 2 }}
+              onClick={() => {
+                navigate(item.path);
+                setIsDropdownOpen(false);
+              }}
+              className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 flex items-center gap-2"
+            >
+              <span>{item.icon}</span>
+              {item.label}
+            </motion.button>
+          ))}
+          
+          <motion.button
+            whileHover={{ x: 2 }}
+            onClick={() => {
+              logout();
+              setIsDropdownOpen(false);
+            }}
+            className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-purple-100"
+          >
+            <span>🚪</span>
+            Logout
+          </motion.button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <motion.nav 
@@ -91,24 +143,41 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
         </motion.div>
       </div>
 
-      {isDashboard ? (
+      {isAuthenticated ? (
         <div className="flex items-center gap-3 md:gap-6">
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="hidden md:flex items-center gap-3 bg-purple-50 px-4 py-2 rounded-lg"
-          >
-            {getUserDisplay()}
-          </motion.div>
+          <div className="relative">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="hidden md:flex items-center gap-3 bg-purple-50 px-4 py-2 rounded-xl cursor-pointer"
+            >
+              <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
+                {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '👤'}
+              </div>
+              <span className="text-gray-700 font-medium flex items-center gap-2">
+                {user?.name || user?.email?.split('@')[0] || 'Loading...'}
+                <motion.svg 
+                  animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+                  className="w-4 h-4 text-gray-600"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </motion.svg>
+              </span>
+            </motion.div>
+            <UserDropdown />
+          </div>
+
           <motion.button 
-            whileHover={{ scale: 1.06 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={logout}
-            className="px-3 md:px-4 py-2 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/20 flex items-center gap-2 hover:bg-purple-700 transition-colors"
-            disabled={loading}
+            className="md:hidden p-2 bg-purple-100 text-purple-600 rounded-lg"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <span className="hidden md:inline">Logout</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </motion.button>
         </div>
@@ -132,6 +201,68 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
           </motion.button>
         </div>
       )}
+
+      <AnimatePresence>
+        {isDropdownOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden fixed top-[72px] left-0 right-0 bg-white border-b border-purple-100 shadow-lg"
+          >
+            <div className="p-4 space-y-3">
+              {isAuthenticated ? (
+                <>
+                  <div className="px-4 py-2 border-b border-purple-100">
+                    <p className="text-sm font-medium text-gray-900">
+                      {user?.name || user?.email?.split('@')[0]}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                  {[
+                    { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
+                    { label: 'Profile', path: '/settings', icon: '👤' },
+                    { label: 'Progress', path: '/progress', icon: '📊' },
+                  ].map((item) => (
+                    <motion.button
+                      key={item.path}
+                      whileHover={{ x: 2 }}
+                      onClick={() => {
+                        navigate(item.path);
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 flex items-center gap-2"
+                    >
+                      <span>{item.icon}</span>
+                      {item.label}
+                    </motion.button>
+                  ))}
+                  <motion.button
+                    whileHover={{ x: 2 }}
+                    onClick={() => {
+                      logout();
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-purple-100"
+                  >
+                    <span>🚪</span>
+                    Logout
+                  </motion.button>
+                </>
+              ) : (
+                <>
+                  <button onClick={handleLogin} className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg">
+                    Login
+                  </button>
+                  <button onClick={handleSignup} className="w-full px-4 py-2 border border-purple-600 text-purple-600 rounded-lg">
+                    Sign Up
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
