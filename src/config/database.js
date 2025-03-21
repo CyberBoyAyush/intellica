@@ -17,6 +17,7 @@ export const createLearningPath = async (userId, topicName, modules) => {
         topicName,
         modules: JSON.stringify(modules), // Convert array to string
         progress: 0,
+        completedModules: JSON.stringify([]), // Initialize as empty array
       }
     );
   } catch (error) {
@@ -39,6 +40,7 @@ export const getLearningPaths = async (userId) => {
       documents: response.documents.map((doc) => ({
         ...doc,
         modules: JSON.parse(doc.modules),
+        completedModules: JSON.parse(doc.completedModules || '[]'), // Parse completedModules
       })),
     };
   } catch (error) {
@@ -167,5 +169,33 @@ export const getUserProgress = async (userId) => {
   } catch (error) {
     console.error("Error fetching user progress:", error);
     return { flashcardCount: 0, quizScores: [] };
+  }
+};
+
+export const markModuleComplete = async (pathId, moduleIndex) => {
+  try {
+    const doc = await databases.getDocument(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      import.meta.env.VITE_COLLECTION_ID,
+      pathId
+    );
+
+    const completedModules = JSON.parse(doc.completedModules || '[]');
+    if (!completedModules.includes(moduleIndex)) {
+      completedModules.push(moduleIndex);
+    }
+
+    return await databases.updateDocument(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      import.meta.env.VITE_COLLECTION_ID,
+      pathId,
+      {
+        completedModules: JSON.stringify(completedModules),
+        progress: Math.round((completedModules.length / JSON.parse(doc.modules).length) * 100)
+      }
+    );
+  } catch (error) {
+    console.error('Module completion update error:', error);
+    throw error;
   }
 };

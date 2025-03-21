@@ -11,6 +11,7 @@ const LearningPathDetails = () => {
   const [path, setPath] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [completedModules, setCompletedModules] = useState([]);
   const databases = new Databases(client);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ const LearningPathDetails = () => {
         ...response,
         modules: JSON.parse(response.modules)
       });
+      setCompletedModules(JSON.parse(response.completedModules || '[]'));
     } catch (error) {
       console.error('Error fetching path details:', error);
       setError('Failed to load learning path');
@@ -118,19 +120,26 @@ const LearningPathDetails = () => {
               >
                 <div className="flex items-center gap-6">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-semibold ${
-                    module.completed 
+                    completedModules.includes(index)
                       ? 'bg-green-100 text-green-600' 
                       : 'bg-purple-100 text-purple-600'
                   }`}>
-                    {module.completed ? (
+                    {completedModules.includes(index) ? (
                       <RiCheckboxCircleFill className="w-6 h-6" />
                     ) : (
-                      <RiTimeLine className="w-6 h-6" />
+                      index + 1
                     )}
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900">Module {index + 1}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      Module {index + 1}
+                      {completedModules.includes(index) && (
+                        <span className="ml-2 text-green-600 text-sm">
+                          (Completed)
+                        </span>
+                      )}
+                    </h3>
                     <p className="text-gray-600 mt-1">{module}</p>
                   </div>
 
@@ -138,25 +147,16 @@ const LearningPathDetails = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleModuleClick(index)}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-purple-500/20 transition-all flex items-center gap-2 group"
+                    className={`px-6 py-3 rounded-xl shadow-lg transition-all flex items-center gap-2 group ${
+                      completedModules.includes(index)
+                        ? 'bg-green-500 text-white hover:shadow-green-500/20'
+                        : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-purple-500/20'
+                    }`}
                   >
-                    {module.completed ? 'Review' : 'Start'} 
+                    {completedModules.includes(index) ? 'Review' : 'Start'} 
                     <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
                   </motion.button>
                 </div>
-
-                {module.completed && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-4 px-4 py-2 bg-green-50 border border-green-100 rounded-lg flex items-center gap-2"
-                  >
-                    <RiCheckboxCircleFill className="text-green-500" />
-                    <span className="text-green-700 text-sm">
-                      Completed on {new Date(module.completedAt).toLocaleDateString()}
-                    </span>
-                  </motion.div>
-                )}
               </motion.div>
             ))}
           </div>

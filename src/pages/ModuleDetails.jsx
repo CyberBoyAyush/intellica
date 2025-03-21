@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { generateModuleContent } from '../config/gemini';
-import { updateLearningPathProgress } from '../config/database';
+import { updateLearningPathProgress, markModuleComplete } from '../config/database';
 import client from '../config/appwrite';
 import { Databases } from 'appwrite';
 import ReactMarkdown from 'react-markdown';
@@ -48,21 +48,16 @@ const ModuleDetails = () => {
 
   const handleComplete = async () => {
     try {
-      const response = await databases.getDocument(
-        import.meta.env.VITE_APPWRITE_DATABASE_ID,
-        import.meta.env.VITE_COLLECTION_ID,
-        pathId
-      );
-      
-      // Calculate new progress by adding 20% (100/5 modules)
-      const newProgress = Math.min((response.progress || 0) + 20, 100);
-      
-      await updateLearningPathProgress(pathId, newProgress);
+      // Mark the module as complete
+      await markModuleComplete(pathId, parseInt(moduleIndex));
       setIsCompleted(true);
+
+      // Show success state and redirect after delay
       setTimeout(() => {
         navigate(`/learning-path/${pathId}`);
       }, 1500);
     } catch (error) {
+      console.error('Error marking module complete:', error);
       setError('Failed to update progress');
     }
   };
