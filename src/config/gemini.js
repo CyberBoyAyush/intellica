@@ -8,30 +8,67 @@ export const generateLearningPath = async (topic) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    const prompt = `Create a learning path for ${topic}. 
-    Provide exactly 5 modules that would help someone learn this topic from basics to advanced level. 
-    Format your response as a clean array of strings, like this:
-    ["Module 1: Introduction", "Module 2: Basics", "Module 3: Intermediate", "Module 4: Advanced", "Module 5: Projects"]`;
+    const prompt = `Create a structured learning path for: "${topic}"
+    Format your response as an array of 5 modules, each with a clear title following this format:
+    ["Module 1: Introduction to ${topic}", "Module 2: Fundamentals of ${topic}", "Module 3: Intermediate ${topic}", "Module 4: Advanced ${topic}", "Module 5: Practical Projects in ${topic}"]`;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = result.response.text();
     
     try {
-      // Clean the text before parsing
-      const cleanText = text.replace(/```json\n|\n```/g, '').trim();
-      return JSON.parse(cleanText);
-    } catch (parseError) {
-      console.error('Parse Error:', parseError);
-      // Fallback: Convert text to array format
-      return text.split('\n')
-        .filter(line => line.trim() && !line.includes('```'))
-        .map(line => line.replace(/^[-*\d.]\s*/, '').trim())
-        .filter(line => line.length > 0)
-        .slice(0, 5); // Ensure we only get 5 modules
+      const cleanText = text.replace(/```json\n|\n```|"/g, '').trim();
+      const modules = JSON.parse(cleanText);
+      return Array.isArray(modules) ? modules.slice(0, 5) : [];
+    } catch (error) {
+      return [
+        `Module 1: Introduction to ${topic}`,
+        `Module 2: Fundamentals of ${topic}`,
+        `Module 3: Intermediate ${topic}`,
+        `Module 4: Advanced ${topic}`,
+        `Module 5: Practical Projects in ${topic}`
+      ];
     }
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    throw new Error('Failed to generate learning path. Please try again.');
+    throw new Error('Failed to generate learning path');
+  }
+};
+
+export const generateModuleContent = async (moduleName) => {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `Create detailed content for module: "${moduleName}".
+    Structure as:
+    {
+      "title": "${moduleName}",
+      "sections": [
+        {
+          "title": "section title",
+          "content": "detailed explanation",
+          "keyPoints": ["key point 1", "key point 2"]
+        }
+      ],
+      "summary": "brief module summary"
+    }`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    
+    try {
+      const cleanText = text.replace(/```json\n|\n```/g, '').trim();
+      return JSON.parse(cleanText);
+    } catch (error) {
+      return {
+        title: moduleName,
+        sections: [{
+          title: "Overview",
+          content: text,
+          keyPoints: ["Content generation failed", "Please try again"]
+        }],
+        summary: "Failed to format content properly"
+      };
+    }
+  } catch (error) {
+    throw new Error('Failed to generate module content');
   }
 };

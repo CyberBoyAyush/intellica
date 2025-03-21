@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import client from '../config/appwrite';
 import { Databases } from 'appwrite';
 
 const LearningPathDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [path, setPath] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,6 +34,10 @@ const LearningPathDetails = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleModuleClick = (index) => {
+    navigate(`/learning-path/${id}/module/${index}`);
   };
 
   if (loading) {
@@ -76,7 +81,10 @@ const LearningPathDetails = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-purple-700">{module}</h3>
-                  <button className="mt-3 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                  <button 
+                    onClick={() => handleModuleClick(index)}
+                    className="mt-3 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
                     Start Learning
                   </button>
                 </div>

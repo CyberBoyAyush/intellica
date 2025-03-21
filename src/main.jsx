@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LearningPathDetails from "./pages/LearningPathDetails";
+import ModuleDetails from "./pages/ModuleDetails";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -43,6 +44,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/flashcards" element={
             <ProtectedRoute>
               <Flashcards />
+            </ProtectedRoute>
+          } />
+          <Route path="/learning-path/:pathId/module/:moduleIndex" element={
+            <ProtectedRoute>
+              <ModuleDetails />
             </ProtectedRoute>
           } />
         </Routes>
