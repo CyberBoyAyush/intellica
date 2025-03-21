@@ -4,7 +4,7 @@ const client = new Client()
     .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT)
     .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID);
 
-const databases = new Databases(client);
+export const databases = new Databases(client);
 
 export const createLearningPath = async (userId, topicName, modules) => {
   try {
@@ -73,5 +73,49 @@ export const deleteLearningPath = async (pathId) => {
   } catch (error) {
     console.error('Delete error:', error);
     throw new Error('Failed to delete learning path');
+  }
+};
+
+export const updateUserProgress = async (userId, data) => {
+  try {
+    const response = await databases.listDocuments(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      'user_progress',
+      [Query.equal('userID', userId)]
+    );
+
+    if (response.documents.length > 0) {
+      const doc = response.documents[0];
+      return await databases.updateDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        'user_progress',
+        doc.$id,
+        {
+          userID: userId,
+          topicName: data.topicName || doc.topicName,
+          quizScores: data.quizScores 
+            ? JSON.stringify([...(JSON.parse(doc.quizScores || '[]')), data.quizScores])
+            : doc.quizScores,
+          flashcardCount: data.flashcardCount 
+            ? (parseInt(doc.flashcardCount || 0) + data.flashcardCount)
+            : doc.flashcardCount
+        }
+      );
+    } else {
+      return await databases.createDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        'user_progress',
+        ID.unique(),
+        {
+          userID: userId,
+          topicName: data.topicName || '',
+          quizScores: data.quizScores ? JSON.stringify([data.quizScores]) : '[]',
+          flashcardCount: data.flashcardCount || 0
+        }
+      );
+    }
+  } catch (error) {
+    console.error('Progress update error:', error);
+    throw error;
   }
 };
