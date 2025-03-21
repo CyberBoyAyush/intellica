@@ -100,7 +100,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
             {getUserDisplay()}
           </motion.div>
           <motion.button 
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.95 }}
             onClick={logout}
             className="px-3 md:px-4 py-2 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/20 flex items-center gap-2 hover:bg-purple-700 transition-colors"
