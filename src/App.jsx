@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import Footer from "./components/Footer";
 import "./App.css"
 
 const App = ({ children }) => {
@@ -11,10 +12,13 @@ const App = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar isDashboard={showSidebar} />
-      <div className="flex pt-16">
+      <div className="flex flex-1 pt-16">
         {showSidebar && <Sidebar />}
-        <div className={`flex-1 p-6 ${showSidebar ? 'ml-64' : ''}`}>
-          {children}
+        <div className={`flex-1 flex flex-col ${showSidebar ? 'ml-64' : ''}`}>
+          <div className="flex-1 p-6">
+            {children}
+          </div>
+          <Footer />
         </div>
       </div>
     </div>
