@@ -7,7 +7,7 @@ const CustomCard = ({ card, isFlipped, onClick }) => (
     <motion.div
       className="absolute w-full h-full"
       initial={false}
-      animate={{ rotateY: isFlipped ? 180 : 0 }}
+      animate={{ rotateX: isFlipped ? 180 : 0 }}
       transition={{ duration: 0.6 }}
       style={{ perspective: 1000, transformStyle: "preserve-3d" }}
     >
@@ -18,18 +18,18 @@ const CustomCard = ({ card, isFlipped, onClick }) => (
       >
         <div className="text-sm text-purple-500 font-semibold">Question {card.id}</div>
         <div className="text-2xl font-medium text-center">{card.frontHTML}</div>
-        <div className="text-sm text-gray-400 text-center">Click to flip</div>
+        <div className="text-sm text-gray-400 text-center">Click to flip ↓</div>
       </div>
 
       {/* Back of card */}
       <div
         className={`absolute w-full h-full bg-purple-50 rounded-2xl p-8 shadow-xl
           ${!isFlipped ? "backface-hidden" : ""} flex flex-col justify-between`}
-        style={{ transform: "rotateY(180deg)" }}
+        style={{ transform: "rotateX(180deg)" }}
       >
         <div className="text-sm text-purple-500 font-semibold">Answer</div>
         <div className="text-lg text-center">{card.backHTML}</div>
-        <div className="text-sm text-gray-400 text-center">Click to flip back</div>
+        <div className="text-sm text-gray-400 text-center">Click to flip ↑</div>
       </div>
     </motion.div>
   </div>
