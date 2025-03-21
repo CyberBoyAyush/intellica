@@ -215,36 +215,63 @@ const Quiz = () => {
         </div>
       ) : (
         <motion.div
-          className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+          className="max-w-4xl mx-auto space-y-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h2 className="text-lg font-bold">Results</h2>
-          <p>
-            Score: {score} / {quizData.questions.length * 10}
-          </p>
-          <p>Accuracy: {accuracy}%</p>
-
-          <h3 className="text-md font-semibold mt-3">Correct Answers:</h3>
-          {quizData.questions.map((q, index) => (
-            <div key={index} className="mt-2">
-              <h4 className="font-medium">{q.question}</h4>
-              <p className="text-green-600">
-                Correct Answer:{" "}
-                {Array.isArray(q.correctAnswer)
-                  ? q.correctAnswer.join(", ")
-                  : q.correctAnswer}
-              </p>
-              <p className="text-gray-600">Explanation: {q.explanation}</p>
+          {/* Results Summary */}
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent mb-4">
+              Quiz Results
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p className="text-sm text-purple-600">Total Score</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  {score} / {quizData.questions.length * 10}
+                </p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p className="text-sm text-purple-600">Accuracy</p>
+                <p className="text-2xl font-bold text-purple-700">{accuracy}%</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p className="text-sm text-purple-600">Questions</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  {quizData.questions.length}
+                </p>
+              </div>
             </div>
-          ))}
+          </div>
 
-          <button
-            onClick={() => setQuizData(null)}
-            className="bg-blue-500 text-white px-4 py-2 rounded w-full mt-4"
-          >
-            Restart Quiz
-          </button>
+          {/* Detailed Review */}
+          <div className="space-y-6">
+            {quizData.questions.map((q, index) => (
+              <QuizCard
+                key={index}
+                question={q.question}
+                answers={q.answers}
+                selectedAnswers={userAnswers[index] || []}
+                onAnswerSelect={() => {}}
+                questionType={q.questionType}
+                showResults={true}
+                correctAnswer={q.correctAnswer}
+                explanation={q.explanation}
+              />
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4">
+            <motion.button
+              onClick={() => setQuizData(null)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg"
+            >
+              Start New Quiz
+            </motion.button>
+          </div>
         </motion.div>
       )}
     </div>
