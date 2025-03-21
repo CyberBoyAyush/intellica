@@ -8,16 +8,23 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  BarChart,
+  Bar,
 } from "recharts";
-import { getLearningPaths } from "../config/database";
+import { getLearningPaths, getUserProgress } from "../config/database";
 import { useAuth } from "../context/AuthContext";
 
 const Progress = () => {
   const { user, loading } = useAuth();
   const [paths, setPaths] = useState([]);
+  const [quizScores, setQuizScores] = useState([]);
+  const [flashcardCount, setFlashcardCount] = useState(0); // State for flashcard count
 
   useEffect(() => {
-    if (user) fetchPaths();
+    if (user) {
+      fetchPaths();
+      fetchQuizStats();
+    }
   }, [user]);
 
   const fetchPaths = async () => {
@@ -29,14 +36,30 @@ const Progress = () => {
     }
   };
 
+  const fetchQuizStats = async () => {
+    try {
+      const response = await getUserProgress(user.$id);
+      setQuizScores(response.quizScores.slice(-5)); // Get last 5 quiz stats
+      setFlashcardCount(response.flashcardCount || 0); // Set flashcard count
+    } catch (error) {
+      console.error("Error fetching quiz stats:", error);
+    }
+  };
+
   if (loading) return <p className="text-center text-purple-600">Loading...</p>;
   if (!user)
     return <p className="text-center text-gray-500">No user data available.</p>;
 
-  // Transforming data for recharts
+  // Transforming data for learning progress chart
   const chartData = paths.map((path) => ({
     topic: path.topicName,
     progress: path.progress,
+  }));
+
+  // Transforming data for quiz accuracy chart
+  const quizChartData = quizScores.map((quiz) => ({
+    topic: quiz.topic,
+    accuracy: parseFloat(quiz.accuracy),
   }));
 
   return (
@@ -47,16 +70,34 @@ const Progress = () => {
       transition={{ duration: 0.6 }}
     >
       <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-        Learning Progress
+        Learning & Quiz Progress
       </h1>
+
+      {/* Flashcard Count */}
+      <motion.div
+        className="w-full max-w-4xl bg-gray-100 p-7 rounded-xl shadow-md mb-8"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
+          <span>📚</span> Flashcards Created
+        </h2>
+        <p className="text-4xl text-center font-extrabold mt-2 drop-shadow-lg">
+          {flashcardCount}
+        </p>
+      </motion.div>
 
       {chartData.length > 0 ? (
         <motion.div
-          className="w-full max-w-4xl bg-gray-100 p-4 rounded-xl shadow-md"
+          className="w-full max-w-4xl bg-gray-100 p-4 rounded-xl shadow-md mb-8"
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5 }}
         >
+          <h2 className="text-xl font-semibold text-purple-700 mb-4">
+            Learning Path Progress
+          </h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
@@ -73,7 +114,31 @@ const Progress = () => {
           </ResponsiveContainer>
         </motion.div>
       ) : (
-        <p className="text-gray-500">No progress data available.</p>
+        <p className="text-gray-500">No learning progress data available.</p>
+      )}
+
+      {quizChartData.length > 0 ? (
+        <motion.div
+          className="w-full max-w-4xl bg-gray-100 p-4 rounded-xl shadow-md"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-xl font-semibold text-purple-700 mb-4">
+            Quiz Accuracy %(Last 5)
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={quizChartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+              <XAxis dataKey="topic" tick={{ fill: "#6B46C1" }} />
+              <YAxis tick={{ fill: "#6B46C1" }} domain={[0, 100]} />
+              <Tooltip />
+              <Bar dataKey="accuracy" fill="#6B46C1" barSize={50} />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      ) : (
+        <p className="text-gray-500">No quiz data available.</p>
       )}
     </motion.div>
   );
