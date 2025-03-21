@@ -1,41 +1,72 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
-  const linkVariants = {
-    hover: { scale: 1.05, x: 10 }
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuItems = [
+    { 
+      icon: "🎯", 
+      label: "Learning Paths",
+      path: "/earning-paths",
+      active: location.pathname.includes('learning-paths')
+    },
+    { 
+      icon: "🗂️", 
+      label: "Flashcards",
+      path: "/flashcards",
+      active: location.pathname.includes('flashcards')
+    },
+    { 
+      icon: "📝", 
+      label: "Quiz",
+      path: "/quiz",
+      active: location.pathname.includes('quiz')
+    },
+    { 
+      icon: "📈", 
+      label: "Progress",
+      path: "/progress",
+      active: location.pathname.includes('progress')
+    },
+    { 
+      icon: "⚙️", 
+      label: "Settings",
+      path: "/settings",
+      active: location.pathname.includes('settings')
+    },
+  ];
+
+  const handleNavigation = (path) => {
+    navigate(path);
   };
 
   return (
-    <motion.aside 
-      initial={{ x: -100 }}
+    <motion.div
+      initial={{ x: -250 }}
       animate={{ x: 0 }}
-      className="w-64 bg-white/80 backdrop-blur-sm shadow-sm min-h-screen p-6"
+      className="w-64 h-screen bg-white border-r border-purple-100 fixed left-0 top-16"
     >
-      <nav className="flex flex-col space-y-6">
-        {[
-          { to: "/dashboard", icon: "📊", text: "Dashboard" },
-          { to: "/learning-path", icon: "📖", text: "Learning Path" },
-          { to: "/quiz", icon: "📝", text: "Quiz" },
-          { to: "/flashcards", icon: "📚", text: "Flashcards" }
-        ].map((item) => (
+      <div className="p-4 space-y-2">
+        {menuItems.map((item, index) => (
           <motion.div
-            key={item.to}
-            variants={linkVariants}
-            whileHover="hover"
+            key={index}
+            whileHover={{ scale: 1.02 }}
+            onClick={() => handleNavigation(item.path)}
+            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
+              item.active 
+                ? "bg-purple-100 text-purple-600" 
+                : "hover:bg-purple-50"
+            }`}
           >
-            <Link 
-              to={item.to} 
-              className="text-gray-700 font-medium hover:text-purple-600 flex items-center gap-3"
-            >
-              <span>{item.icon}</span>
-              {item.text}
-            </Link>
+            <span className="text-xl">{item.icon}</span>
+            <span className="font-medium">{item.label}</span>
           </motion.div>
         ))}
-      </nav>
-    </motion.aside>
+      </div>
+    </motion.div>
   );
 };
 

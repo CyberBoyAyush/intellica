@@ -1,7 +1,18 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ isDashboard }) => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate("/dashboard");
+  };
+
+  const handleSignup = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <motion.nav 
       initial={{ y: -100 }}
@@ -42,7 +53,26 @@ const Navbar = ({ isDashboard }) => {
             </svg>
           </motion.button>
         </div>
-      ) : null}
+      ) : (
+        <div className="space-x-4">
+          <motion.button
+            onClick={handleLogin}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/20 hover:bg-purple-700"
+          >
+            Login
+          </motion.button>
+          <motion.button
+            onClick={handleSignup}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50"
+          >
+            Sign Up
+          </motion.button>
+        </div>
+      )}
     </motion.nav>
   );
 };
