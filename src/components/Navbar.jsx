@@ -13,11 +13,15 @@ const Navbar = ({ isDashboard }) => {
     navigate("/dashboard");
   };
 
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
     <motion.nav 
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="bg-white/70 backdrop-blur-md border-b border-purple-100 px-8 py-4 flex justify-between items-center fixed top-0 w-full z-10"
+      className="bg-white/70 backdrop-blur-md border-b border-purple-100 px-8 py-4 flex justify-between items-center fixed top-0 w-full z-[999]"
     >
       <motion.div 
         whileHover={{ scale: 1.05 }}
@@ -43,6 +47,7 @@ const Navbar = ({ isDashboard }) => {
             <span className="text-gray-700 font-medium">John Doe</span>
           </motion.div>
           <motion.button 
+            onClick={handleLogout}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-lg shadow-purple-500/20 flex items-center gap-2"

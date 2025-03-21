@@ -47,7 +47,7 @@ const Sidebar = () => {
     <motion.div
       initial={{ x: -250 }}
       animate={{ x: 0 }}
-      className="w-64 h-screen bg-white border-r border-purple-100 fixed left-0 top-16"
+      className="w-64 h-screen bg-white border-r border-purple-100 fixed left-0 top-0 z-[998]"
     >
       <div className="p-4 space-y-2">
         {menuItems.map((item, index) => (

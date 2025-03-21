@@ -9,11 +9,13 @@ const App = ({ children }) => {
   const showSidebar = location.pathname !== '/' && location.pathname !== '/home';
 
   return (
-    <div className="bg-background min-h-screen flex">
-      {showSidebar && <Sidebar />}
-      <div className={`${showSidebar ? 'flex-1' : 'w-full'}`}>
-        <Navbar isDashboard={showSidebar} />
-        <div className="p-6 mt-20">{children}</div>
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar isDashboard={showSidebar} />
+      <div className="flex pt-16">
+        {showSidebar && <Sidebar />}
+        <div className={`flex-1 p-6 ${showSidebar ? 'ml-64' : ''}`}>
+          {children}
+        </div>
       </div>
     </div>
   );
