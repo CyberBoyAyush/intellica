@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { generateQuizData } from "../config/gemini";
+import QuizCard from "../components/QuizCard";
 
 const Quiz = () => {
   const [topic, setTopic] = useState("");
@@ -74,42 +75,70 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50">
         <motion.div
-          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5 }}
-        ></motion.div>
-        <p className="ml-3 text-lg font-semibold">Generating Quiz...</p>
+          className="text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
+          <p className="text-lg font-semibold text-purple-600">Generating Quiz...</p>
+        </motion.div>
       </div>
     );
   }
 
   if (!quizData) {
     return (
-      <div className="p-6 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">AI-Powered Quiz</h1>
-        <input
-          type="text"
-          placeholder="Enter Quiz Topic"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          className="border p-2 rounded w-full mb-2"
-        />
-        <input
-          type="number"
-          placeholder="Number of Questions"
-          value={numQuestions}
-          onChange={(e) => setNumQuestions(parseInt(e.target.value))}
-          className="border p-2 rounded w-full mb-2"
-        />
-        <button
-          onClick={handleGenerateQuiz}
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8">
+        <motion.div 
+          className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          Generate Quiz
-        </button>
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+            AI-Powered Quiz
+          </h1>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quiz Topic
+              </label>
+              <input
+                type="text"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="e.g., JavaScript Fundamentals, World History"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Number of Questions
+              </label>
+              <input
+                type="number"
+                value={numQuestions}
+                onChange={(e) => setNumQuestions(parseInt(e.target.value))}
+                min="1"
+                max="10"
+                className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+            <motion.button
+              onClick={handleGenerateQuiz}
+              className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Generate Quiz
+            </motion.button>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -121,51 +150,33 @@ const Quiz = () => {
     : [currentQuestion.correctAnswer];
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8">
       {!showResults ? (
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.3 }}
-          className="p-4 border rounded shadow"
-        >
-          <h2 className="text-lg font-bold">
-            Question {currentIndex + 1} / {quizData.questions.length}
-          </h2>
-          <h2 className="text-lg font-semibold mt-2">
-            {currentQuestion.question}
-          </h2>
-          <p className="text-sm text-gray-600 mb-2">
-            Type: {currentQuestion.questionType.toUpperCase()} | Points:{" "}
-            {currentQuestion.point}
-          </p>
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-800">
+              {topic} Quiz
+            </h2>
+            <div className="flex items-center justify-center gap-4 mt-2">
+              <span className="text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                Question {currentIndex + 1} of {quizData.questions.length}
+              </span>
+              <span className="text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                Points: {currentQuestion.point}
+              </span>
+            </div>
+          </div>
 
-          {currentQuestion.answers.map((option, index) => {
-            const isSelected = userAnswer.includes(option);
-            const isCorrect = correctAnswer.includes(option);
-            const isWrong = isSelected && !isCorrect;
+          <QuizCard
+            question={currentQuestion.question}
+            answers={currentQuestion.answers}
+            selectedAnswers={userAnswers[currentIndex] || []}
+            onAnswerSelect={handleAnswerSelect}
+            questionType={currentQuestion.questionType}
+            showResults={false}
+          />
 
-            return (
-              <motion.div
-                key={index}
-                className={`p-2 border rounded cursor-pointer mt-1 ${
-                  isSelected
-                    ? isCorrect
-                      ? "bg-green-400 text-white"
-                      : "bg-red-400 text-white"
-                    : "bg-gray-200"
-                }`}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleAnswerSelect(option)}
-              >
-                {option}
-              </motion.div>
-            );
-          })}
-
-          <div className="flex justify-between mt-4">
+          <div className="flex justify-between mt-6">
             <button
               onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
               className={`px-4 py-2 rounded ${
@@ -201,40 +212,66 @@ const Quiz = () => {
               Show Result
             </button>
           )}
-        </motion.div>
+        </div>
       ) : (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          className="max-w-4xl mx-auto space-y-8"
+          initial={{ opacity: 0, y: 19 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="p-4 border rounded bg-gray-100"
         >
-          <h2 className="text-lg font-bold">Results</h2>
-          <p>
-            Score: {score} / {quizData.questions.length * 10}
-          </p>
-          <p>Accuracy: {accuracy}%</p>
-
-          <h3 className="text-md font-semibold mt-3">Correct Answers:</h3>
-          {quizData.questions.map((q, index) => (
-            <div key={index} className="mt-2">
-              <h4 className="font-medium">{q.question}</h4>
-              <p className="text-green-600">
-                Correct Answer:{" "}
-                {Array.isArray(q.correctAnswer)
-                  ? q.correctAnswer.join(", ")
-                  : q.correctAnswer}
-              </p>
-              <p className="text-gray-600">Explanation: {q.explanation}</p>
+          {/* Results Summary */}
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent mb-4">
+              Quiz Results
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p className="text-sm text-purple-600">Total Score</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  {score} / {quizData.questions.length * 10}
+                </p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p className="text-sm text-purple-600">Accuracy</p>
+                <p className="text-2xl font-bold text-purple-700">{accuracy}%</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p className="text-sm text-purple-600">Questions</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  {quizData.questions.length}
+                </p>
+              </div>
             </div>
-          ))}
+          </div>
 
-          <button
-            onClick={() => setQuizData(null)}
-            className="bg-blue-500 text-white px-4 py-2 rounded w-full mt-4"
-          >
-            Restart Quiz
-          </button>
+          {/* Detailed Review */}
+          <div className="space-y-6">
+            {quizData.questions.map((q, index) => (
+              <QuizCard
+                key={index}
+                question={q.question}
+                answers={q.answers}
+                selectedAnswers={userAnswers[index] || []}
+                onAnswerSelect={() => {}}
+                questionType={q.questionType}
+                showResults={true}
+                correctAnswer={q.correctAnswer}
+                explanation={q.explanation}
+              />
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4">
+            <motion.button
+              onClick={() => setQuizData(null)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg"
+            >
+              Start New Quiz
+            </motion.button>
+          </div>
         </motion.div>
       )}
     </div>
