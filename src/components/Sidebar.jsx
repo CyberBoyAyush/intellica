@@ -8,6 +8,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const menuItems = [
     { 
+      icon: "🏠", 
+      label: "Dashboard",
+      path: "/dashboard",
+      active: location.pathname === '/dashboard'
+    },
+    { 
       icon: "🎯", 
       label: "Learning Paths",
       path: "/learning-path",

@@ -9,33 +9,94 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkUser();
-  }, []);
-
   const checkUser = async () => {
     try {
-      const session = await account.get();
-      setUser(session);
+      const session = await account.getSession('current');
+      if (session) {
+        const userData = await account.get();
+        setUser(userData);
+        return userData;
+      }
+      setUser(null);
+      return null;
     } catch (error) {
       console.error('Session error:', error);
+      setUser(null);
+      return null;
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const login = async (email, password) => {
+    setLoading(true);
     try {
-      await account.deleteSession('current');
-      setUser(null);
-      navigate('/');
+      const session = await account.createEmailPasswordSession(email, password);
+      if (session) {
+        const userData = await account.get();
+        setUser(userData);
+        setLoading(false);
+        navigate('/dashboard', { replace: true });
+        return userData;
+      }
+      throw new Error('Session creation failed');
     } catch (error) {
-      console.error('Logout error:', error);
+      setLoading(false);
+      console.error('Login error:', error);
+      throw error;
     }
   };
 
+  const signup = async (email, password, name) => {
+    try {
+      await account.create('unique()', email, password, name);
+      await login(email, password);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await account.deleteSession('current');
+      setUser(null);
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add periodic session check
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      if (user) {
+        const userData = await checkUser();
+        if (!userData) {
+          // Session expired
+          navigate('/login', { replace: true });
+        }
+      }
+    }, 300000); // Check every 5 minutes
+
+    return () => clearInterval(intervalId);
+  }, [user]);
+
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      signup, 
+      logout,
+      isAuthenticated: !!user 
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

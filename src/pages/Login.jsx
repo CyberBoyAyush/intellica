@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { account } from '../config/appwrite';
+import { useAuth } from '../context/AuthContext'; // Add this import
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Add this line
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -12,30 +13,16 @@ const Login = () => {
     password: '',
   });
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-
+    setLoading(true);
+    
     try {
-      // Delete existing sessions if any
-      try {
-        await account.deleteSession('current');
-      } catch (err) {
-        // Ignore error if no session exists
-      }
-
-      // Create new session
-      await account.createEmailPasswordSession(formData.email, formData.password);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error("Login error:", error);
-      if (error.code === 401) {
-        setError('Invalid email or password');
-      } else {
-        setError('Login failed. Please try again.');
-      }
-    } finally {
+      await login(formData.email, formData.password); // Use formData
+      // Login successful - redirect handled by AuthContext
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
       setLoading(false);
     }
   };
@@ -51,7 +38,7 @@ const Login = () => {
           Welcome Back
         </h2>
         
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-gray-700">Email</label>
             <input
