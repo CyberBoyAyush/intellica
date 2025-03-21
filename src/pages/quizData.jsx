@@ -1,25 +1,5 @@
 export const quiz = {
   nrOfQuestions: "6",
-  quizSynopsis: (
-    <>
-      <p>
-        Welcome to the React Quiz! 🚀 This quiz will test your knowledge of
-        React concepts, including state management, components, and core
-        principles.
-      </p>
-      <p>
-        <strong>Instructions:</strong>
-      </p>
-      <ul>
-        <li>🔹 Read each question carefully.</li>
-        <li>🔹 Select the correct answer(s) from the given options.</li>
-        <li>🔹 Some questions may have multiple correct answers.</li>
-        <li>🔹 Click 'Next' to move to the next question.</li>
-        <li>🔹 Your final score will be displayed at the end.</li>
-      </ul>
-      <p>Good luck! 🍀</p>
-    </>
-  ),
   questions: [
     {
       question:
