@@ -119,7 +119,7 @@ export const generateLearningPath = async (topic) => {
   }
 };
 
-export const generateModuleContent = async (moduleName, isExpanded = false) => {
+export const generateModuleContent = async (moduleName, options = { detailed: false }) => {
   if (!moduleName || typeof moduleName !== "string") {
     throw new Error("Invalid module name provided");
   }
@@ -130,8 +130,17 @@ export const generateModuleContent = async (moduleName, isExpanded = false) => {
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const prompt = `Create educational content for: "${moduleName}"
-      Important: Ensure all code examples are properly formatted without markdown code blocks or comments.
+      const detailedPrompt = options.detailed ? `
+        Provide advanced, in-depth content including:
+        - Detailed explanations with examples
+        - Common pitfalls and solutions
+        - Best practices and industry standards
+        - Advanced use cases and scenarios
+        - Related concepts and their relationships
+        - Implementation details and optimization tips` : '';
+
+      const prompt = `Create ${options.detailed ? 'detailed' : 'basic'} educational content for: "${moduleName}"
+      ${detailedPrompt}
       
       Return a JSON object with this EXACT structure:
       {
@@ -139,64 +148,46 @@ export const generateModuleContent = async (moduleName, isExpanded = false) => {
         "sections": [
           {
             "title": "Section Title",
-            "content": "Regular content here",
-            "keyPoints": ["Point 1", "Point 2"],
+            "content": "Detailed content with examples",
+            "keyPoints": ["Key point 1", "Key point 2"],
             "codeExample": {
               "language": "javascript",
-              "code": "const example = true;\\nconsole.log(example);",
-              "explanation": "Code explanation"
+              "code": "// Clean, working code example",
+              "explanation": "Detailed code explanation"
             }
           }
         ],
-        "summary": "Summary text",
-        "hasMoreContent": true,
-        "difficulty": "beginner",
-        "estimatedTimeMinutes": 30
+        "summary": "Comprehensive summary",
+        "difficulty": "${options.detailed ? 'advanced' : 'beginner'}",
+        "estimatedTimeMinutes": ${options.detailed ? 45 : 30}
       }`;
 
       const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      let text = result.response.text();
       
-      // Clean and parse the response
-      const cleanText = sanitizeJSON(text);
-      
-      try {
-        const content = JSON.parse(cleanText);
-        
-        // Clean and validate sections
-        content.sections = content.sections.map(section => ({
-          ...section,
-          codeExample: cleanCodeExample(section.codeExample)
-        }));
+      // Enhanced JSON cleaning and parsing
+      text = sanitizeJSON(text);
+      const content = JSON.parse(text);
 
-        return content;
-      } catch (parseError) {
-        console.error('JSON parsing error:', parseError);
+      if (!validateModuleContent(content)) {
         throw new Error('Invalid content structure');
       }
+
+      // Process and clean content
+      content.sections = content.sections.map(section => ({
+        ...section,
+        content: sanitizeContent(section.content),
+        codeExample: section.codeExample ? cleanCodeExample(section.codeExample) : null
+      }));
+
+      return content;
     } catch (error) {
       lastError = error;
-      console.error(`Attempt ${attempt} failed:`, error);
       await sleep(RETRY_DELAY);
     }
   }
 
-  console.error("All attempts failed:", lastError);
-  return {
-    title: moduleName,
-    sections: [
-      {
-        title: "Content Generation Error",
-        content: "We're experiencing technical difficulties. Please try again later.",
-        keyPoints: ["System is temporarily unavailable"],
-        codeExample: null
-      }
-    ],
-    summary: "Error generating content",
-    hasMoreContent: false,
-    difficulty: "beginner",
-    estimatedTimeMinutes: 0
-  };
+  throw lastError || new Error('Failed to generate content');
 };
 
 export const generateFlashcards = async (topic, numCards = 5) => {
