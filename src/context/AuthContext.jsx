@@ -73,6 +73,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Add updateUser function
+  const updateUser = (newUserData) => {
+    setUser(newUserData);
+  };
+
   // Add periodic session check
   useEffect(() => {
     const intervalId = setInterval(async () => {
@@ -95,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       login, 
       signup, 
       logout,
+      updateUser, // Add updateUser to the context value
       isAuthenticated: !!user 
     }}>
       {!loading && children}

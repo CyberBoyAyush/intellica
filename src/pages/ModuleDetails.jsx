@@ -24,6 +24,8 @@ const ModuleDetails = () => {
   const loadContent = async (expanded = false) => {
     try {
       setLoading(true);
+      setError('');
+
       const response = await databases.getDocument(
         import.meta.env.VITE_APPWRITE_DATABASE_ID,
         import.meta.env.VITE_COLLECTION_ID,
@@ -32,21 +34,36 @@ const ModuleDetails = () => {
 
       const modules = JSON.parse(response.modules);
       const moduleTitle = modules[parseInt(moduleIndex)];
-      
-      // Get initial content
-      const moduleContent = await generateModuleContent(moduleTitle, expanded);
-      setContent(moduleContent);
-      
-      // If expanded, get additional content
+
+      // Add loading state for content
+      setContent({
+        title: moduleTitle,
+        sections: [{
+          title: "Loading...",
+          content: "Preparing your content...",
+          keyPoints: [],
+          codeExample: null
+        }]
+      });
+
       if (expanded) {
-        setLoading(true);
         const additionalContent = await generateModuleContent(moduleTitle, true);
+        if (!additionalContent?.sections?.length) {
+          throw new Error('Failed to generate expanded content');
+        }
         setExpandedContent(additionalContent);
+        setIsExpanded(true);
+      } else {
+        const initialContent = await generateModuleContent(moduleTitle, false);
+        if (!initialContent?.sections?.length) {
+          throw new Error('Failed to generate content');
+        }
+        setContent(initialContent);
       }
-      
-      setIsExpanded(expanded);
     } catch (error) {
-      setError('Failed to load module content');
+      console.error('Content loading error:', error);
+      setError('Failed to load content. Please try again.');
+      setContent(null);
     } finally {
       setLoading(false);
     }
