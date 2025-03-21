@@ -1,11 +1,75 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getLearningPaths, getUserProgress } from "../config/database";
+import { account } from "../config/appwrite";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [paths, setPaths] = useState([]);
+  const [flashcardCount, setFlashcardCount] = useState(0);
+  const [quizScores, setQuizScores] = useState([]);
+
+  useEffect(() => {
+    fetchUserProgress();
+    fetchPaths();
+  }, []);
+
+  const fetchUserProgress = async () => {
+    try {
+      const user = await account.get(); // Get logged-in user
+      const progress = await getUserProgress(user.$id); // Fetch progress
+
+      setFlashcardCount(progress.flashcardCount || 0);
+
+      // Ensure quizScores is safely parsed
+      let parsedQuizScores = [];
+      if (progress.quizScores) {
+        try {
+          parsedQuizScores = Array.isArray(progress.quizScores)
+            ? progress.quizScores // If already an array, use it directly
+            : JSON.parse(progress.quizScores); // Otherwise, parse it
+
+          console.log(parsedQuizScores);
+        } catch (error) {
+          console.error("Error parsing quizScores JSON:", error);
+        }
+      }
+
+      setQuizScores(parsedQuizScores);
+    } catch (error) {
+      console.error("Error fetching user progress:", error);
+    }
+  };
+
+  const fetchPaths = async () => {
+    try {
+      const user = await account.get();
+      const response = await getLearningPaths(user.$id);
+
+      // Filtering paths where progress is less than 100
+      const incompletePaths = response.documents.filter(
+        (path) => path.progress < 100
+      );
+
+      setPaths(incompletePaths);
+    } catch (error) {
+      console.error("Error fetching paths:", error);
+    }
+  };
+
+  const calculateSuccessRate = () => {
+    if (!quizScores.length) return 0; // Avoid division by zero
+
+    const totalAccuracy = quizScores.reduce(
+      (sum, score) => sum + parseFloat(score.accuracy),
+      0
+    );
+
+    return (totalAccuracy / quizScores.length).toFixed(2); // Average accuracy
+  };
 
   const cards = [
     {
@@ -14,15 +78,18 @@ const Dashboard = () => {
       icon: "📚",
       color: "from-purple-500 to-purple-600",
       path: "/learning-path",
-      stats: "2 paths in progress"
+      stats: `${
+        paths.filter((path) => path.progress < 100).length
+      } paths in progress`, // ✅ Fix: Remove extra {}
     },
+
     {
       title: "Flashcards",
       description: "Practice with your decks",
       icon: "🗂️",
       color: "from-indigo-500 to-indigo-600",
       path: "/flashcards",
-      stats: "50 cards mastered"
+      stats: `${flashcardCount} cards mastered`,
     },
     {
       title: "Quiz Performance",
@@ -30,8 +97,8 @@ const Dashboard = () => {
       icon: "📊",
       color: "from-violet-500 to-violet-600",
       path: "/quiz",
-      stats: "85% success rate"
-    }
+      stats: `${calculateSuccessRate()}% success rate`,
+    },
   ];
 
   const quickActions = [
@@ -43,21 +110,23 @@ const Dashboard = () => {
 
   return (
     <div className="flex-1 max-w-full p-6 overflow-x-hidden">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="max-w-7xl mx-auto space-y-8"
       >
         {/* Welcome Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-r from-purple-600 to-purple-400 rounded-2xl p-8 text-white shadow-lg"
         >
           <h1 className="text-3xl font-bold mb-2">
-            Welcome back, {user?.name?.split(' ')[0] || 'Learner'}! 👋
+            Welcome back, {user?.name?.split(" ")[0] || "Learner"}! 👋
           </h1>
-          <p className="text-purple-100">Ready to continue your learning journey?</p>
+          <p className="text-purple-100">
+            Ready to continue your learning journey?
+          </p>
         </motion.div>
 
         {/* Quick Actions */}
@@ -71,7 +140,9 @@ const Dashboard = () => {
               className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
             >
               <span className="text-2xl">{action.icon}</span>
-              <span className="text-sm font-medium text-gray-700">{action.label}</span>
+              <span className="text-sm font-medium text-gray-700">
+                {action.label}
+              </span>
             </motion.button>
           ))}
         </div>
@@ -106,16 +177,23 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Recent Activity
+          </h2>
           <div className="space-y-4">
             {[1, 2, 3].map((_, index) => (
-              <div key={index} className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg"
+              >
                 <div className="w-2 h-2 rounded-full bg-purple-500"></div>
                 <div className="flex-1">
                   <p className="text-gray-800">Completed Python Basics Quiz</p>
                   <p className="text-sm text-gray-500">2 hours ago</p>
                 </div>
-                <div className="text-sm font-medium text-purple-600">Score: 90%</div>
+                <div className="text-sm font-medium text-purple-600">
+                  Score: 90%
+                </div>
               </div>
             ))}
           </div>
