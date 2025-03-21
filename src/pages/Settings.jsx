@@ -7,7 +7,6 @@ const Settings = () => {
 
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>No user data available.</p>;
-  console.log(user);
 
   const userName = user?.name || "User";
   const userEmail = user?.email || "No email provided";
