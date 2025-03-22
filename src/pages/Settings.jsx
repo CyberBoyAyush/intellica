@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { RiUserLine, RiMailLine, RiSaveLine, RiEditLine, RiMedalLine, RiTimeLine, RiFireLine } from "react-icons/ri";
+import {
+  RiUserLine,
+  RiMailLine,
+  RiSaveLine,
+  RiEditLine,
+  RiMedalLine,
+  RiTimeLine,
+  RiFireLine,
+} from "react-icons/ri";
 import { account } from "../config/appwrite";
 import QuizStreak from "./Streak";
 import { getUserProgress } from "../config/database";
+import { format, differenceInDays, parseISO } from "date-fns";
 
 const Settings = () => {
   const { user, loading, updateUser } = useAuth();
@@ -15,6 +24,58 @@ const Settings = () => {
     email: user?.email || "",
   });
   const [updateStatus, setUpdateStatus] = useState({ type: "", message: "" });
+  const [quizDates, setQuizDates] = useState(new Set());
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
+
+  useEffect(() => {
+    if (quizScores.length > 0) {
+      // Extract & format quiz dates
+      const dates = quizScores.map((q) =>
+        format(parseISO(q.date), "yyyy-MM-dd")
+      );
+      setQuizDates(new Set(dates));
+
+      // Calculate streaks
+      calculateStreaks(dates);
+    }
+  }, [quizScores]);
+
+  const calculateStreaks = (dates) => {
+    if (dates.length === 0) return;
+
+    // Sort dates & remove duplicates
+    const sortedDates = [...new Set(dates)].sort();
+
+    let tempStreak = 1,
+      maxStreak = 1;
+
+    for (let i = 1; i < sortedDates.length; i++) {
+      const diff = differenceInDays(
+        parseISO(sortedDates[i]),
+        parseISO(sortedDates[i - 1])
+      );
+
+      if (diff === 1) {
+        tempStreak++; // Increase streak if consecutive
+      } else if (diff > 1) {
+        maxStreak = Math.max(maxStreak, tempStreak);
+        tempStreak = 1; // Reset streak if there's a gap
+      }
+    }
+    maxStreak = Math.max(maxStreak, tempStreak);
+
+    // Calculate current streak
+    const today = format(new Date(), "yyyy-MM-dd");
+    const lastQuizDate = sortedDates[sortedDates.length - 1];
+    const daysSinceLastQuiz = differenceInDays(
+      parseISO(today),
+      parseISO(lastQuizDate)
+    );
+
+    setCurrentStreak(daysSinceLastQuiz <= 1 ? tempStreak : 0);
+    setLongestStreak(maxStreak);
+  };
 
   useEffect(() => {
     if (user) {
@@ -95,16 +156,16 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-6">
+    <div className="min-h-screen pb-16 bg-gradient-to-br from-slate-50 to-purple-50 p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto space-y-8"
       >
         {/* Profile Card */}
-        <motion.div className="bg-white/70 backdrop-blur-sm rounded-2xl p-2 md:p-8 shadow-xl border border-purple-100/30">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        <motion.div className="bg-white/70 backdrop-blur-sm rounded-2xl p-3.5 md:p-8 shadow-xl border border-purple-100/30">
+          <div className="flex items-center justify-between mb-8 ">
+            <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Profile Settings
             </h1>
             <motion.button
@@ -208,14 +269,14 @@ const Settings = () => {
           </form>
         </motion.div>
       </motion.div>
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto mt-8 space-y-6"
       >
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <motion.div 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <motion.div
             whileHover={{ y: -2 }}
             className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-100/30"
           >
@@ -225,12 +286,14 @@ const Settings = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total Quizzes</p>
-                <p className="text-xl font-bold text-purple-600">{quizScores.length}</p>
+                <p className="text-xl font-bold text-purple-600">
+                  {quizScores.length}
+                </p>
               </div>
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             whileHover={{ y: -2 }}
             className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-100/30"
           >
@@ -239,44 +302,31 @@ const Settings = () => {
                 <RiFireLine className="text-indigo-600 text-xl" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Current Streak</p>
-                <p className="text-xl font-bold text-indigo-600">5 days</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            whileHover={{ y: -2 }}
-            className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-100/30"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-pink-100 rounded-lg">
-                <RiTimeLine className="text-pink-600 text-xl" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Learning Time</p>
-                <p className="text-xl font-bold text-pink-600">12.5 hrs</p>
+                <p className="text-sm text-gray-500">Total Streak</p>
+                <p className="text-xl font-bold text-indigo-600">
+                  {currentStreak + longestStreak}
+                </p>
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Streak Calendar Card */}
-        <motion.div 
+        <motion.div
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 300 }}
           className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-purple-100/30"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            <h2 className="md:text-3xl text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Your Learning Streak
             </h2>
-            <div className="flex items-center gap-2 text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+            <div className="flex items-center gap-2 text-sm md:text-2xl text-purple-600 bg-purple-50 px-1 md:px-3 py-1 md:py-2 rounded-md md:rounded-full">
               <RiFireLine className="text-orange-500" />
               <span>Keep it up!</span>
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-3 md:mb-8">
             <QuizStreak quizScores={quizScores} />
           </div>
         </motion.div>

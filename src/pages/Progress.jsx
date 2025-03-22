@@ -64,12 +64,12 @@ const Progress = () => {
 
   return (
     <motion.div
-      className="flex flex-col items-center p-6 bg-white min-h-screen"
+      className="flex flex-col items-center pb-14 p-6 bg-white min-h-screen"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+      <h1 className="text-3xl text-center font-bold mb-8 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
         Learning & Quiz Progress
       </h1>
 
@@ -83,7 +83,7 @@ const Progress = () => {
         <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
           <span>📚</span> Flashcards Created
         </h2>
-        <p className="text-4xl text-center font-extrabold mt-2 drop-shadow-lg">
+        <p className="text-2xl md:text-4xl text-center md:font-extrabold mt-2 drop-shadow-lg">
           {flashcardCount}
         </p>
       </motion.div>

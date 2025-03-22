@@ -207,12 +207,12 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
 
       {isAuthenticated ? (
         <div className="flex items-center gap-3 md:gap-6">
-          <span className="flex gap-1">
+          <motion.span className="flex gap-1">
             {" "}
             <RiFireFill className="text-2xl text-amber-500" />
             {currentStreak}
-          </span>
-          <div className="relative">
+          </motion.span>
+          {/* <div className="relative">
             <motion.div
               whileHover={{ scale: 1.02 }}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -242,7 +242,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
               </span>
             </motion.div>
             <UserDropdown />
-          </div>
+          </div> */}
 
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -286,13 +286,15 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
         </div>
       )}
 
+      {/* horizontal bar in mobile view */}
+
       <AnimatePresence>
         {isDropdownOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden fixed top-[72px] left-0 right-0 bg-white border-b border-purple-100 shadow-lg"
+            className=" md:hidden fixed top-[72px] left-0 right-0 bg-white border-b border-purple-100 shadow-lg"
           >
             <div className="p-4 space-y-3">
               {isAuthenticated ? (
