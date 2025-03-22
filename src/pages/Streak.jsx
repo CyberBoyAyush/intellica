@@ -59,13 +59,13 @@ const QuizStreak = ({ quizScores }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-3 md:p-6 rounded-lg shadow-lg md:w-xl mt-5 md:mt-12">
+    <div className="bg-gray-100 p-2 md:p-6 rounded-lg shadow-lg md:w-xl mt-5 md:mt-12">
       <h2 className="text-2xl font-semibold text-purple-700 mb-4 text-center">
         Quiz Streak 🔥
       </h2>
 
       {/* Streak Display */}
-      <div className="flex flex-col justify-between text-lg font-medium mb-4">
+      <div className="flex flex-col justify-between md:text-lg md:font-medium mb-4">
         <span>
           🔥 Current Streak:{" "}
           <span className="text-purple-600">{currentStreak} Days</span>

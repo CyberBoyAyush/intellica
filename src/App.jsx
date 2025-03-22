@@ -3,28 +3,41 @@ import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer";
-import "./App.css"
+import "./App.css";
 
 const App = ({ children }) => {
   const location = useLocation();
-  const showSidebar = !['/login', '/signup', '/', '/home' , '/reset-password'].includes(location.pathname);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const showSidebar = ![
+    "/login",
+    "/signup",
+    "/",
+    "/home",
+    "/reset-password",
+  ].includes(location.pathname);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar starts closed
 
   return (
     <div className="min-h-screen flex flex-col bg-background overflow-x-hidden">
-      <Navbar 
-        isDashboard={showSidebar} 
+      {/* Navbar */}
+      <Navbar
+        isDashboard={showSidebar}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex flex-1 pt-16">
+
+      <div className="flex flex-1 pt-16 relative">
+        {/* Sidebar */}
         {showSidebar && (
           <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         )}
-        <div className={`flex-1 flex flex-col ${showSidebar && isSidebarOpen ? 'ml-64' : ''}`}>
-          <div className="flex-1 p-6">
-            {children}
-          </div>
+
+        {/* Main Content */}
+        <div
+          className={`flex-1 flex flex-col transition-all duration-300 ${
+            showSidebar && isSidebarOpen ? "md:ml-64" : ""
+          }`}
+        >
+          <div className="flex-1 p-6">{children}</div>
           <Footer />
         </div>
       </div>
