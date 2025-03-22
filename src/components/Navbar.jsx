@@ -212,7 +212,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
             <RiFireFill className="text-2xl text-amber-500" />
             {currentStreak}
           </motion.span>
-          {/* <div className="relative">
+          <div className="hidden md:block md:relative">
             <motion.div
               whileHover={{ scale: 1.02 }}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -242,7 +242,7 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
               </span>
             </motion.div>
             <UserDropdown />
-          </div> */}
+          </div>
 
           <motion.button
             whileHover={{ scale: 1.05 }}
