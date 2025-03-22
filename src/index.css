@@ -19,3 +19,9 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}
