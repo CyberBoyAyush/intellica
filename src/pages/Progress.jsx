@@ -75,15 +75,15 @@ const Progress = () => {
 
       {/* Flashcard Count */}
       <motion.div
-        className="w-full max-w-4xl bg-gray-100 p-7 rounded-xl shadow-md mb-8"
+        className="w-full max-w-4xl bg-gray-100 p-4 md:p-7 rounded-xl shadow-md mb-8"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
+        <h2 className="text-lg md:text-2xl font-semibold flex items-center justify-center gap-2">
           <span>📚</span> Flashcards Created
         </h2>
-        <p className="text-2xl md:text-4xl text-center md:font-extrabold mt-2 drop-shadow-lg">
+        <p className="text-xl md:text-4xl text-center md:font-extrabold md:mt-2 drop-shadow-lg">
           {flashcardCount}
         </p>
       </motion.div>
@@ -98,20 +98,22 @@ const Progress = () => {
           <h2 className="text-xl font-semibold text-purple-700 mb-4">
             Learning Path Progress
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
-              <XAxis dataKey="topic" tick={{ fill: "#6B46C1" }} />
-              <YAxis tick={{ fill: "#6B46C1" }} />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="progress"
-                stroke="#6B46C1"
-                strokeWidth={3}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-[200px] md:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+                <XAxis dataKey="topic" tick={{ fill: "#6B46C1" }} />
+                <YAxis tick={{ fill: "#6B46C1" }} />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="progress"
+                  stroke="#6B46C1"
+                  strokeWidth={3}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
       ) : (
         <p className="text-gray-500">No learning progress data available.</p>
@@ -127,15 +129,17 @@ const Progress = () => {
           <h2 className="text-xl font-semibold text-purple-700 mb-4">
             Quiz Accuracy %(Last 5)
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={quizChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
-              <XAxis dataKey="topic" tick={{ fill: "#6B46C1" }} />
-              <YAxis tick={{ fill: "#6B46C1" }} domain={[0, 100]} />
-              <Tooltip />
-              <Bar dataKey="accuracy" fill="#6B46C1" barSize={50} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-[200px] md:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={quizChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+                <XAxis dataKey="topic" tick={{ fill: "#6B46C1" }} />
+                <YAxis tick={{ fill: "#6B46C1" }} domain={[0, 100]} />
+                <Tooltip />
+                <Bar dataKey="accuracy" fill="#6B46C1" barSize={50} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
       ) : (
         <p className="text-gray-500">No quiz data available.</p>

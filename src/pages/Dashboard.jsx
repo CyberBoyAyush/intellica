@@ -107,7 +107,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex-1 max-w-full p-6 overflow-x-hidden">
+    <div className="flex-1 max-w-full p-2 md:p-6 overflow-x-hidden">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -128,14 +128,14 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           {quickActions.map((action, index) => (
             <motion.button
               key={index}
               onClick={() => navigate(action.path)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
+              className="flex items-center gap-3 p-2 md:p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
             >
               <span className="text-2xl">{action.icon}</span>
               <span className="text-sm font-medium text-gray-700">

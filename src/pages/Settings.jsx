@@ -156,7 +156,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen pb-16 bg-gradient-to-br from-slate-50 to-purple-50 p-6">
+    <div className="min-h-screen pb-12 md:pb-16 rounded-2xl bg-gradient-to-br from-slate-50 to-purple-50 p-4 md:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -315,7 +315,7 @@ const Settings = () => {
         <motion.div
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 300 }}
-          className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-purple-100/30"
+          className="bg-white/70 backdrop-blur-sm rounded-2xl p-3 md:p-8 shadow-xl border border-purple-100/30"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="md:text-3xl text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">

@@ -93,7 +93,7 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50">
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-4">
         <motion.div
           className="text-center"
           initial={{ opacity: 0 }}
@@ -114,13 +114,13 @@ const Quiz = () => {
 
   if (!quizData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8">
+      <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-purple-50 via-white to-purple-50 p-4 sm:p-8">
         <motion.div
-          className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+          className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-4 sm:p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
             AI-Powered Quiz
           </h1>
           <div className="space-y-4">
@@ -132,7 +132,7 @@ const Quiz = () => {
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                 placeholder="e.g., JavaScript Fundamentals, World History"
               />
             </div>
@@ -146,12 +146,12 @@ const Quiz = () => {
                 onChange={(e) => setNumQuestions(parseInt(e.target.value))}
                 min="1"
                 max="10"
-                className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
               />
             </div>
             <motion.button
               onClick={handleGenerateQuiz}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg"
+              className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg text-sm sm:text-base"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -170,16 +170,16 @@ const Quiz = () => {
     : [currentQuestion.correctAnswer];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8">
+    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-purple-50 via-white to-purple-50 p-4 sm:p-8">
       {!showResults ? (
         <div className="max-w-4xl mx-auto">
           <div className="mb-6 text-center">
-            <h2 className="text-2xl font-bold text-gray-800">{topic} Quiz</h2>
-            <div className="flex items-center justify-center gap-4 mt-2">
-              <span className="text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{topic} Quiz</h2>
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-2">
+              <span className="text-xs sm:text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
                 Question {currentIndex + 1} of {quizData.questions.length}
               </span>
-              <span className="text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+              <span className="text-xs sm:text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
                 Points: {currentQuestion.point}
               </span>
             </div>
@@ -197,7 +197,7 @@ const Quiz = () => {
           <div className="flex justify-between mt-6">
             <motion.button
               onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
-              className={`flex h-14 w-14 items-center gap-2 px-4 py-2 rounded-full ${
+              className={`flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full ${
                 currentIndex === 0
                   ? "bg-purple-300 text-white cursor-not-allowed"
                   : "bg-purple-400 text-white"
@@ -206,7 +206,7 @@ const Quiz = () => {
               whileHover={{ scale: currentIndex === 0 ? 1 : 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <AiOutlineLeft className="text-lg" />
+              <AiOutlineLeft className="text-base sm:text-lg" />
             </motion.button>
 
             {/* Next Button */}
@@ -216,7 +216,7 @@ const Quiz = () => {
                   Math.min(prev + 1, quizData.questions.length - 1)
                 )
               }
-              className={`flex h-14 w-14 items-center gap-2 px-4 py-2 rounded-full ${
+              className={`flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full ${
                 currentIndex === quizData.questions.length - 1
                   ? "bg-purple-300 text-white cursor-not-allowed"
                   : "bg-purple-400 text-white"
@@ -227,21 +227,20 @@ const Quiz = () => {
               }}
               whileTap={{ scale: 0.9 }}
             >
-              <AiOutlineRight className="text-lg" />
+              <AiOutlineRight className="text-base sm:text-lg" />
             </motion.button>
           </div>
 
           {currentIndex === quizData.questions.length - 1 && (
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-6">
               <motion.button
                 onClick={() => setShowResults(true)}
-                className="bg-gradient-to-r from-purple-400 to-purple-500 text-white text-2xl px-6 py-3 rounded-xl max-w-4xl mt-4 shadow-lg"
+                className="bg-gradient-to-r from-purple-400 to-purple-500 text-white text-lg sm:text-2xl px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg w-full sm:w-auto"
                 whileHover={{
-                  scale: 1.1,
+                  scale: 1.05,
                   boxShadow: "0px 4px 10px rgba(128, 0, 128, 0.5)",
                 }}
                 whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
               >
                 Show Result
               </motion.button>
@@ -250,31 +249,31 @@ const Quiz = () => {
         </div>
       ) : (
         <motion.div
-          className="max-w-4xl mx-auto space-y-8"
-          initial={{ opacity: 0, y: 19 }}
+          className="max-w-4xl mx-auto space-y-6 sm:space-y-8"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           {/* Results Summary */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent mb-4">
               Quiz Results
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-purple-50 p-4 rounded-xl">
-                <p className="text-sm text-purple-600">Total Score</p>
-                <p className="text-2xl font-bold text-purple-700">
+                <p className="text-xs sm:text-sm text-purple-600">Total Score</p>
+                <p className="text-xl sm:text-2xl font-bold text-purple-700">
                   {score} / {quizData.questions.length * 10}
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-xl">
-                <p className="text-sm text-purple-600">Accuracy</p>
-                <p className="text-2xl font-bold text-purple-700">
+                <p className="text-xs sm:text-sm text-purple-600">Accuracy</p>
+                <p className="text-xl sm:text-2xl font-bold text-purple-700">
                   {accuracy}%
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-xl">
-                <p className="text-sm text-purple-600">Questions</p>
-                <p className="text-2xl font-bold text-purple-700">
+                <p className="text-xs sm:text-sm text-purple-600">Questions</p>
+                <p className="text-xl sm:text-2xl font-bold text-purple-700">
                   {quizData.questions.length}
                 </p>
               </div>
@@ -282,7 +281,7 @@ const Quiz = () => {
           </div>
 
           {/* Detailed Review */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {quizData.questions.map((q, index) => (
               <QuizCard
                 key={index}
@@ -299,12 +298,12 @@ const Quiz = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 pb-8">
             <motion.button
               onClick={() => setQuizData(null)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl font-medium shadow-lg text-sm sm:text-base w-full sm:w-auto"
             >
               Start New Quiz
             </motion.button>
