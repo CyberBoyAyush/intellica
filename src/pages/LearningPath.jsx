@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { account } from '../config/appwrite';
-import { generateLearningPath } from '../config/gemini';
-import { createLearningPath, getLearningPaths, deleteLearningPath } from '../config/database';
-import { useNavigate } from 'react-router-dom';
+import { account } from "../config/appwrite";
+import { generateLearningPath } from "../config/gemini";
+import {
+  createLearningPath,
+  getLearningPaths,
+  deleteLearningPath,
+} from "../config/database";
+import { useNavigate } from "react-router-dom";
 
 const LearningPath = () => {
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [topicName, setTopicName] = useState('');
-  const [error, setError] = useState('');
+  const [topicName, setTopicName] = useState("");
+  const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
@@ -32,7 +36,7 @@ const LearningPath = () => {
       const response = await getLearningPaths(user.$id);
       setPaths(response.documents);
     } catch (error) {
-      console.error('Error fetching paths:', error);
+      console.error("Error fetching paths:", error);
     }
   };
 
@@ -41,9 +45,9 @@ const LearningPath = () => {
     try {
       const user = await account.get();
       const modules = await generateLearningPath(topicName);
-      
+
       if (!Array.isArray(modules) || modules.length === 0) {
-        throw new Error('Invalid response from AI');
+        throw new Error("Invalid response from AI");
       }
 
       await createLearningPath(user.$id, topicName, modules);
@@ -51,8 +55,8 @@ const LearningPath = () => {
       fetchPaths();
       // Show success message
     } catch (error) {
-      console.error('Error creating path:', error);
-      setError(error.message || 'Failed to create learning path');
+      console.error("Error creating path:", error);
+      setError(error.message || "Failed to create learning path");
     } finally {
       setLoading(false);
     }
@@ -64,7 +68,7 @@ const LearningPath = () => {
       await deleteLearningPath(pathId);
       await fetchPaths(); // Refresh the list
     } catch (error) {
-      setError('Failed to delete learning path');
+      setError("Failed to delete learning path");
     }
   };
 
@@ -72,31 +76,36 @@ const LearningPath = () => {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: { staggerChildren: 0.1 },
+    },
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    show: { opacity: 1, y: 0 },
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-6">
-      <motion.div 
+    <div className="min-h-screen rounded-2xl bg-gradient-to-br from-slate-50 to-purple-50 p-6">
+      <motion.div
         className="max-w-6xl mx-auto space-y-8"
         variants={container}
         initial="hidden"
         animate="show"
       >
         {/* Header Section */}
-        <motion.div variants={item} className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-purple-100/30">
+        <motion.div
+          variants={item}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-purple-100/30"
+        >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 Learning Paths
               </h1>
-              <p className="text-gray-600 mt-2">Create and manage your personalized learning journeys</p>
+              <p className="text-gray-600 mt-2">
+                Create and manage your personalized learning journeys
+              </p>
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -118,7 +127,7 @@ const LearningPath = () => {
         </motion.div>
 
         {/* Learning Paths Grid */}
-        <motion.div 
+        <motion.div
           variants={item}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
@@ -133,11 +142,24 @@ const LearningPath = () => {
               <motion.button
                 className="absolute top-4 right-4 p-2 bg-red-100/80 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
                 onClick={(e) => handleDelete(e, path.$id)}
-                whileHover={{ scale: 1.1, backgroundColor: "rgba(254, 226, 226, 0.9)" }}
+                whileHover={{
+                  scale: 1.1,
+                  backgroundColor: "rgba(254, 226, 226, 0.9)",
+                }}
                 whileTap={{ scale: 0.95 }}
               >
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg
+                  className="w-5 h-5 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
               </motion.button>
 
@@ -147,7 +169,7 @@ const LearningPath = () => {
 
               <div className="space-y-4">
                 <div className="w-full bg-purple-100 rounded-full h-3">
-                  <motion.div 
+                  <motion.div
                     className="bg-gradient-to-r from-purple-600 to-indigo-600 h-3 rounded-full"
                     style={{ width: `${path.progress}%` }}
                     initial={{ width: 0 }}
@@ -156,7 +178,9 @@ const LearningPath = () => {
                   />
                 </div>
                 <div className="flex justify-between items-center">
-                  <p className="text-gray-600 font-medium">{path.progress}% Complete</p>
+                  <p className="text-gray-600 font-medium">
+                    {path.progress}% Complete
+                  </p>
                   <span className="text-purple-600">→</span>
                 </div>
               </div>
@@ -167,7 +191,7 @@ const LearningPath = () => {
         {/* Enhanced Create Path Modal */}
         <AnimatePresence>
           {showModal && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -194,7 +218,9 @@ const LearningPath = () => {
 
                   {/* Topic Input */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Topic Name</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Topic Name
+                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -211,7 +237,9 @@ const LearningPath = () => {
 
                   {/* Topic Suggestions */}
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-gray-700">Popular Topics</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Popular Topics
+                    </label>
                     <div className="grid grid-cols-2 gap-2">
                       {topicSuggestions.map((topic, index) => (
                         <motion.button
@@ -221,8 +249,8 @@ const LearningPath = () => {
                           onClick={() => setTopicName(topic.name)}
                           className={`p-3 rounded-xl flex items-center gap-2 transition-all ${
                             topicName === topic.name
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'hover:bg-purple-50 text-gray-600'
+                              ? "bg-purple-100 text-purple-700"
+                              : "hover:bg-purple-50 text-gray-600"
                           }`}
                         >
                           <span>{topic.icon}</span>
@@ -253,7 +281,11 @@ const LearningPath = () => {
                         <div className="flex items-center gap-2">
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
                             className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                           />
                           <span>Generating Path...</span>
@@ -270,7 +302,7 @@ const LearningPath = () => {
                   {/* Error Message */}
                   <AnimatePresence>
                     {error && (
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}

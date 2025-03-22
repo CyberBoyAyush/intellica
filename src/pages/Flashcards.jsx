@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateFlashcards } from "../config/gemini";
 import { updateUserProgress } from "../config/database";
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 const CustomCard = ({ card, isFlipped, onClick }) => (
   <div className="relative w-full h-[400px] cursor-pointer" onClick={onClick}>
@@ -18,7 +18,9 @@ const CustomCard = ({ card, isFlipped, onClick }) => (
         className={`absolute w-full h-full bg-white rounded-2xl p-8 shadow-xl 
           ${isFlipped ? "backface-hidden" : ""} flex flex-col justify-between`}
       >
-        <div className="text-sm text-purple-500 font-semibold">Question {card.id}</div>
+        <div className="text-sm text-purple-500 font-semibold">
+          Question {card.id}
+        </div>
         <div className="text-2xl font-medium text-center">{card.frontHTML}</div>
         <div className="text-sm text-gray-400 text-center">Click to flip ↓</div>
       </div>
@@ -60,11 +62,11 @@ const Flashcards = () => {
     try {
       const generatedCards = await generateFlashcards(topic, numCards);
       setCards(generatedCards);
-      
+
       if (user?.$id) {
         await updateUserProgress(user.$id, {
           topicName: topic,
-          flashcardCount: generatedCards.length // Update with actual number of cards
+          flashcardCount: generatedCards.length, // Update with actual number of cards
         });
       }
     } catch (err) {
@@ -78,20 +80,20 @@ const Flashcards = () => {
   const handleNext = () => {
     if (currentCardIndex < cards.length - 1) {
       setIsFlipped(false);
-      setCurrentCardIndex(prev => prev + 1);
+      setCurrentCardIndex((prev) => prev + 1);
     }
   };
 
   const handlePrev = () => {
     if (currentCardIndex > 0) {
       setIsFlipped(false);
-      setCurrentCardIndex(prev => prev - 1);
+      setCurrentCardIndex((prev) => prev - 1);
     }
   };
 
   return (
     <motion.div
-      className="flex flex-col items-center min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8"
+      className="flex flex-col rounded-2xl items-center min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 p-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -102,7 +104,7 @@ const Flashcards = () => {
         animate={{ y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
           Interactive Flashcards
         </h1>
         <p className="text-gray-600 text-center mb-8">
@@ -110,7 +112,7 @@ const Flashcards = () => {
         </p>
 
         {/* Enhanced Input Section */}
-        <motion.div 
+        <motion.div
           className="bg-white p-6 rounded-2xl shadow-lg mb-8"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -118,7 +120,9 @@ const Flashcards = () => {
         >
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Topic</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Topic
+              </label>
               <input
                 type="text"
                 value={topic}
@@ -128,11 +132,15 @@ const Flashcards = () => {
               />
             </div>
             <div className="w-full md:w-32">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Cards</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Cards
+              </label>
               <input
                 type="number"
                 value={numCards}
-                onChange={(e) => setNumCards(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) =>
+                  setNumCards(Math.max(1, parseInt(e.target.value) || 1))
+                }
                 className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
@@ -147,12 +155,26 @@ const Flashcards = () => {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     Generating...
                   </span>
-                ) : "Generate Cards"}
+                ) : (
+                  "Generate Cards"
+                )}
               </motion.button>
             </div>
           </div>
@@ -160,7 +182,7 @@ const Flashcards = () => {
 
         {/* Status Messages */}
         {error && (
-          <motion.div 
+          <motion.div
             className="bg-red-50 text-red-600 p-4 rounded-xl mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -184,7 +206,7 @@ const Flashcards = () => {
                   isFlipped={isFlipped}
                   onClick={() => setIsFlipped(!isFlipped)}
                 />
-                
+
                 {/* Navigation Controls */}
                 <div className="flex justify-between items-center w-full mt-8 px-4">
                   <motion.button
