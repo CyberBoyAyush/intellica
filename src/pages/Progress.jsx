@@ -75,15 +75,15 @@ const Progress = () => {
 
       {/* Flashcard Count */}
       <motion.div
-        className="w-full max-w-4xl bg-gray-100 p-7 rounded-xl shadow-md mb-8"
+        className="w-full max-w-4xl bg-gray-100 p-4 md:p-7 rounded-xl shadow-md mb-8"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
+        <h2 className="text-lg md:text-2xl font-semibold flex items-center justify-center gap-2">
           <span>📚</span> Flashcards Created
         </h2>
-        <p className="text-2xl md:text-4xl text-center md:font-extrabold mt-2 drop-shadow-lg">
+        <p className="text-xl md:text-4xl text-center md:font-extrabold md:mt-2 drop-shadow-lg">
           {flashcardCount}
         </p>
       </motion.div>

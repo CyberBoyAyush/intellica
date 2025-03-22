@@ -32,7 +32,7 @@ const CustomCard = ({ card, isFlipped, onClick }) => (
         style={{ transform: "rotateX(180deg)" }}
       >
         <div className="text-sm text-purple-500 font-semibold">Answer</div>
-        <div className="text-lg text-center">{card.backHTML}</div>
+        <div className="text-base md:text-lg text-center">{card.backHTML}</div>
         <div className="text-sm text-gray-400 text-center">Click to flip ↑</div>
       </div>
     </motion.div>
