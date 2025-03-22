@@ -7,7 +7,7 @@ import "./App.css"
 
 const App = ({ children }) => {
   const location = useLocation();
-  const showSidebar = !['/login', '/signup', '/', '/home'].includes(location.pathname);
+  const showSidebar = !['/login', '/signup', '/', '/home' , '/reset-password'].includes(location.pathname);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (

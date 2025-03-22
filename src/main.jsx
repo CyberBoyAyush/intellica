@@ -16,6 +16,7 @@ import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
 import { AuthProvider } from "./context/AuthContext";
 import Chat from "./pages/Chat";
+import ResetPassword from "./pages/ResetPassword";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
