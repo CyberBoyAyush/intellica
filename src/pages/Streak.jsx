@@ -59,7 +59,7 @@ const QuizStreak = ({ quizScores }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-3 md:p-6 rounded-lg shadow-lg max-w-3xl mt-12">
+    <div className="bg-gray-100 p-3 md:p-6 rounded-lg shadow-lg md:w-xl mt-5 md:mt-12">
       <h2 className="text-2xl font-semibold text-purple-700 mb-4 text-center">
         Quiz Streak 🔥
       </h2>
@@ -78,11 +78,14 @@ const QuizStreak = ({ quizScores }) => {
 
       {/* Calendar */}
       <div className="flex justify-center">
-        <div className="max-w-5/6  md:max-w-lg lg:max-w-xl p-2 ">
+        <div className="w-64  md:w-fit p-1 text-sm md:text-xl">
           <Calendar
+            className=""
             tileClassName={({ date }) => {
               const formattedDate = format(date, "yyyy-MM-dd");
-              return quizDates.has(formattedDate) ? "relative rounded-md" : "";
+              return quizDates.has(formattedDate)
+                ? "relative rounded-md z-10"
+                : "";
             }}
             tileContent={({ date }) => {
               const formattedDate = format(date, "yyyy-MM-dd");
