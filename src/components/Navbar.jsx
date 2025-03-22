@@ -199,8 +199,8 @@ const Navbar = ({ isDashboard, isSidebarOpen, setIsSidebarOpen }) => {
           >
             <RiBrainLine className="text-white text-xl" />
           </motion.div>
-          <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-            INTELLICA
+          <span className="text-xl font-serif md:text-2xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
+            Intellica
           </span>
         </motion.div>
       </div>
