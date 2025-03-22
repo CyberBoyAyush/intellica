@@ -68,10 +68,10 @@ npm run dev
 ---
 
 ## **👥 Our Team**  
-🚀 **Ayush Sharma** – Frontend & Animations  
-🎨 **Vranda Garg** – UI/UX & Tailwind CSS  
-💻 **Aditi Shrivastava** – Backend & Appwrite Integration  
-🧠 **Sneha Agarwal** – AI & Gemini API Implementation  
+🚀 **Ayush Sharma**
+🎨 **Vranda Garg** 
+💻 **Aditi Shrivastava** 
+🧠 **Sneha Agarwal** 
 
 ---
 
