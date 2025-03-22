@@ -42,21 +42,36 @@ const Home = () => {
     }
   };
 
+  const floatingAnimation = {
+    initial: { y: 0 },
+    animate: {
+      y: [-10, 10, -10],
+      transition: {
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    }
+  };
+
   const features = [
-    { 
-      icon: <RiRocketLine className="text-4xl text-purple-600" />,
+    {
+      icon: <RiRocketLine className="text-5xl text-purple-600" />,
       title: "AI-Powered Learning",
-      description: "Personalized learning paths created just for you"
+      description: "Experience personalized learning paths crafted by advanced AI algorithms",
+      gradient: "from-purple-500/20 to-indigo-500/20"
     },
-    { 
-      icon: <RiBrainLine className="text-4xl text-purple-600" />,
+    {
+      icon: <RiBrainLine className="text-5xl text-purple-600" />,
       title: "Smart Integration",
-      description: "Seamless integration with modern learning tools"
+      description: "Seamlessly connect with modern learning tools and platforms",
+      gradient: "from-purple-500/20 to-pink-500/20"
     },
-    { 
-      icon: <RiBarChartBoxLine className="text-4xl text-purple-600" />,
+    {
+      icon: <RiBarChartBoxLine className="text-5xl text-purple-600" />,
       title: "Progress Tracking",
-      description: "Detailed analytics and performance insights"
+      description: "Monitor your growth with detailed analytics and insights",
+      gradient: "from-indigo-500/20 to-purple-500/20"
     }
   ];
 
@@ -201,49 +216,75 @@ const Home = () => {
     </motion.div>
   );
 
+  const stats = [
+    { 
+      number: "10K+", 
+      label: "Active Users",
+      icon: "👥",
+      gradient: "from-purple-500/20 to-indigo-500/20"
+    },
+    { 
+      number: "50+", 
+      label: "Learning Topics",
+      icon: "📚",
+      gradient: "from-indigo-500/20 to-purple-500/20"
+    },
+    { 
+      number: "95%", 
+      label: "Success Rate",
+      icon: "🎯",
+      gradient: "from-purple-500/20 to-pink-500/20"
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 overflow-hidden">
-      {/* Animated background gradients */}
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-purple-50/30 overflow-hidden">
+      {/* Enhanced animated background */}
       <div className="fixed inset-0 -z-10">
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.2, 0.3],
+            opacity: [0.2, 0.3, 0.2],
           }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute -top-20 -right-20 w-96 h-96 bg-purple-200 rounded-full blur-3xl"
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-purple-300/30 to-indigo-300/30 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
             scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.3, 0.2],
+            opacity: [0.3, 0.2, 0.3],
           }}
-          transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-          className="absolute -bottom-20 -left-20 w-96 h-96 bg-blue-200 rounded-full blur-3xl"
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-purple-200/30 to-pink-200/30 rounded-full blur-3xl"
         />
       </div>
 
       <motion.div 
         style={{ y }}
-        className="max-w-7xl mx-auto px-4 py-24"
+        className="max-w-7xl mx-auto px-4 py-24 relative"
       >
         {/* Enhanced Hero Section */}
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="text-center space-y-10"
+          className="text-center space-y-12 relative"
         >
           <BadgeComponent />
 
           <motion.h1 
             variants={item}
-            className="text-5xl md:text-7xl font-bold tracking-tight"
+            className="text-6xl md:text-8xl font-bold tracking-tight leading-tight"
           >
-            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Transform Your Learning
+            <span className="relative">
+              <span className="absolute -inset-1 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 blur-2xl" />
+              <span className="relative bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Transform Your Learning
+              </span>
             </span>
-            <span className="block mt-2 text-gray-900">With AI-Powered Education</span>
+            <span className="block mt-4 text-4xl md:text-5xl text-gray-800">
+              With AI-Powered Education
+            </span>
           </motion.h1>
 
           <motion.p variants={item} className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -253,20 +294,20 @@ const Home = () => {
           {/* Enhanced CTA Section */}
           <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(124, 58, 237, 0.2)" }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/dashboard")}
-              className="group px-8 py-4 bg-purple-600 text-white rounded-xl font-medium shadow-lg flex items-center gap-2"
+              className="group px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-medium shadow-xl flex items-center gap-3 text-lg transition-all duration-300"
             >
               Start Learning
               <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
             </motion.button>
             
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              className="px-8 py-4 border border-purple-200 text-purple-600 rounded-xl font-medium flex items-center gap-2"
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(124, 58, 237, 0.1)" }}
+              className="px-10 py-5 bg-white/80 backdrop-blur border border-purple-100 text-purple-600 rounded-2xl font-medium flex items-center gap-3 text-lg shadow-lg"
             >
-              <RiPlayCircleLine className="text-xl" />
+              <RiPlayCircleLine className="text-2xl" />
               Watch Demo
             </motion.button>
           </motion.div>
@@ -287,17 +328,27 @@ const Home = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="mt-40 grid grid-cols-1 md:grid-cols-3 gap-8"
         >
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              whileHover={{ y: -8 }}
-              className="group p-8 bg-white/70 backdrop-blur-sm rounded-2xl border border-purple-100/30"
+              variants={floatingAnimation}
+              initial="initial"
+              animate="animate"
+              whileHover={{ 
+                y: -15,
+                transition: { duration: 0.3 }
+              }}
+              className={`group p-8 bg-white/70 backdrop-blur-sm rounded-3xl border border-purple-100/30 
+                shadow-lg hover:shadow-2xl transition-all duration-300 
+                bg-gradient-to-br ${feature.gradient}`}
             >
-              {feature.icon}
-              <h3 className="text-xl font-semibold mt-4 text-gray-900">{feature.title}</h3>
-              <p className="mt-2 text-gray-600">{feature.description}</p>
+              <div className="bg-white/80 rounded-2xl p-4 w-fit group-hover:scale-110 transition-transform duration-300">
+                {feature.icon}
+              </div>
+              <h3 className="text-2xl font-semibold mt-6 text-gray-900">{feature.title}</h3>
+              <p className="mt-4 text-gray-600 leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -311,30 +362,57 @@ const Home = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mt-32 grid grid-cols-3 gap-8 text-center"
+          className="mt-32 max-w-6xl mx-auto"
         >
-          {[
-            { number: "10K+", label: "Users" },
-            { number: "50+", label: "Topics" },
-            { number: "95%", label: "Success" }
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              className="p-6 bg-white/50 backdrop-blur-sm rounded-xl border border-purple-100/20"
-            >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {stats.map((stat, index) => (
               <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", delay: index * 0.1 }}
-                className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent"
+                key={index}
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 20px 40px rgba(124, 58, 237, 0.15)",
+                }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                  delay: index * 0.1 
+                }}
+                className={`p-8 bg-white/70 backdrop-blur-sm rounded-3xl border border-purple-100/30
+                  bg-gradient-to-br ${stat.gradient} relative overflow-hidden group`}
               >
-                {stat.number}
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: index * 0.2 }}
+                  className="text-4xl mb-4"
+                >
+                  {stat.icon}
+                </motion.div>
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.3 }}
+                  className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
+                >
+                  {stat.number}
+                </motion.div>
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.4 }}
+                  className="text-gray-600 mt-2 text-lg font-medium"
+                >
+                  {stat.label}
+                </motion.div>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                />
               </motion.div>
-              <div className="text-gray-600 mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </motion.div>
       </motion.div>
     </div>
