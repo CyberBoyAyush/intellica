@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,15 @@ const Login = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [resetStatus, setResetStatus] = useState('');
 
+  useEffect(() => {
+    const checkAndRedirect = async () => {
+      if (localStorage.getItem('userSession')) {
+        navigate('/dashboard');
+      }
+    };
+    checkAndRedirect();
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -24,7 +33,7 @@ const Login = () => {
     
     try {
       await login(formData.email, formData.password);
-      // Login successful - redirect handled by AuthContext
+      window.location.href = '/dashboard';  // Use full page redirect
     } catch (err) {
       setError(err.message || 'Login failed. Please try again.');
       setLoading(false);

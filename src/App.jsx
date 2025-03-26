@@ -4,10 +4,12 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer";
 import "./App.css";
+import { useAuth } from './context/AuthContext';
 
 const App = ({ children }) => {
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
-  const showSidebar = ![
+  const showSidebar = isAuthenticated && ![
     "/login",
     "/signup",
     "/",
