@@ -29,15 +29,8 @@ const Signup = () => {
       );
 
       if (account_response.$id) {
-        try {
-          // Create session
-          await account.createEmailPasswordSession(formData.email, formData.password);
-          navigate('/dashboard');
-        } catch (sessionError) {
-          console.error("Session creation failed:", sessionError);
-          // If session creation fails, still redirect to login
-          navigate('/login');
-        }
+        await account.createEmailPasswordSession(formData.email, formData.password);
+        window.location.href = '/dashboard';  // Use full page redirect
       }
     } catch (error) {
       console.error("Signup error:", error);
